@@ -18,3 +18,18 @@ in one responsive web application.
 - Tools: Git, GitHub, VS Code
 
 ## Run Locally
+
+1. Clone the repository
+
+        git clone https://github.com/Ishanijha03/PlaceWise.git
+
+2. Install backend dependencies
+
+        cd Backend
+        npm install
+
+3. Start the server
+
+        node server.js
+
+4. Open Frontend/index.html in your browser
