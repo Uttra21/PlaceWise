@@ -1,0 +1,173 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: white;
+
+    /* LIGHTER BLUE GRADIENT */
+    background: linear-gradient(135deg, #3a7bd5, #a6c1ee);
+
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ICON BACKGROUND */
+body::before {
+    content: "";
+    position: fixed;   /* IMPORTANT FIX */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: url("bgpattern.png");
+
+    background-size: 500px;   /* BIGGER ICONS */
+    background-repeat: repeat;
+
+    opacity: 0.2;   /* MORE VISIBLE */
+
+    z-index: -1;
+}
+.place {
+    color: #001f5b;
+    font-weight: bold;
+}
+
+.wise {
+    color: #a3d1ff;
+    font-weight: bold;
+}
+
+.tagline {
+    color: #ddd;
+    font-style: italic;
+    transform: skewX(-10deg);
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.95);
+    color: black;
+    width: 320px;
+    margin: 120px auto;
+    padding: 25px;
+    border-radius: 15px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+input {
+    width: 80%;
+    padding: 10px;
+    margin: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    background: #0b3d91;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.card {
+    background: white;
+    color: black;
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Chatbox */
+.chatbox {
+    width: 320px;
+    margin: 20px auto;
+    background: white;
+    color: black;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+#chat {
+    height: 200px;
+    overflow-y: auto;
+    text-align: left;
+}
+/* DASHBOARD LAYOUT */
+.dashboard {
+    display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 200px;
+    background: #0b3d91;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin: 15px 0;
+}
+
+/* Main */
+.main {
+    flex: 1;
+    padding: 30px;
+}
+
+/* Cards */
+.cards {
+    display: flex;
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 10px;
+    width: 120px;
+    text-align: center;
+}
+
+/* Big Card */
+.big-card {
+    background: white;
+    color: black;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+/* BOT ICON */
+.bot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #0b3d91;
+    color: white;
+    font-size: 20px;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* CHAT POPUP */
+.chat-popup {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 250px;
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+}

@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlaceWise Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;600;700;800;900&family=Satoshi:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #dbeeff;
+  --bg2: #cce3f8;
+  --bg3: #b8d6f5;
+  --bg4: #e8f4ff;
+  --surface: rgba(255,255,255,0.72);
+  --surface2: rgba(255,255,255,0.5);
+  --surface3: rgba(255,255,255,0.35);
+  --blue: #1a6ff0;
+  --blue2: #0d56c8;
+  --blue3: #3d8ef8;
+  --blue-soft: rgba(26,111,240,0.12);
+  --cyan: #0ea5e9;
+  --teal: #0d9488;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --pink: #ec4899;
+  --purple: #8b5cf6;
+  --orange: #f97316;
+  --red: #ef4444;
+  --text: #0f2744;
+  --text2: #1e3a5f;
+  --muted: #5b7fa6;
+  --muted2: #7da0c4;
+  --border: rgba(26,111,240,0.15);
+  --border2: rgba(255,255,255,0.8);
+  --shadow: 0 4px 24px rgba(15,39,68,0.1);
+  --shadow2: 0 8px 40px rgba(15,39,68,0.14);
+  --sidebar: 272px;
+  --radius: 18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ANIMATED BG */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* GLASSMORPHISM SIDEBAR */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);
+  background:rgba(255,255,255,0.65);
+  border-right:1px solid rgba(255,255,255,0.9);
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
+  display:flex;flex-direction:column;z-index:100;
+  box-shadow:4px 0 32px rgba(26,111,240,0.08);
+}
+.logo-wrap{padding:28px 22px 20px;border-bottom:1px solid rgba(26,111,240,0.1);}
+.logo{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;letter-spacing:-0.8px;}
+.logo .p{color:var(--text);}.logo .w{color:var(--blue);}
+.logo-tagline{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:3px;}
+.user-card{margin:14px 14px 6px;padding:13px 15px;background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.12);border-radius:14px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow);}
+.u-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;flex-shrink:0;color:#fff;box-shadow:0 4px 12px rgba(26,111,240,0.3);}
+.u-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.u-tag{font-size:11px;color:var(--muted);margin-top:1px;}
+.streak-pill{margin:0 14px 10px;padding:10px 14px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.06));border:1px solid rgba(245,158,11,0.3);border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s;}
+.streak-pill:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,0.2);}
+.streak-fire{font-size:22px;animation:flicker 1.5s infinite alternate;}
+@keyframes flicker{from{transform:scale(1)rotate(-3deg)}to{transform:scale(1.15)rotate(3deg)}}
+.streak-num{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:var(--gold);}
+.streak-label{font-size:11px;color:rgba(180,120,0,0.8);font-weight:500;}
+.nav-grp{padding:6px 10px 2px;}
+.nav-grp-label{font-size:10px;color:var(--muted2);letter-spacing:2.5px;text-transform:uppercase;padding:0 10px 7px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 13px;border-radius:11px;cursor:pointer;font-size:13.5px;color:var(--muted);transition:all 0.2s;margin-bottom:2px;position:relative;font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.7);color:var(--text);}
+.nav-item.active{background:rgba(26,111,240,0.1);color:var(--blue);font-weight:600;border:1px solid rgba(26,111,240,0.2);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--blue);border-radius:0 3px 3px 0;}
+.nav-ico{font-size:15px;width:19px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--blue);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;}
+.nav-badge.gold{background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.3);font-weight:700;}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--pink);margin-left:auto;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(26,111,240,0.1);}
+.logout-btn{width:100%;padding:10px;border-radius:11px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.logout-btn:hover{background:rgba(239,68,68,0.15);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);min-height:100vh;position:relative;z-index:1;}
+.topbar{position:sticky;top:0;z-index:50;height:64px;background:rgba(219,238,255,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.8);padding:0 30px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.page-title{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:var(--text);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.search-wrap{position:relative;}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);}
+.search-input{background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.15);border-radius:11px;padding:8px 14px 8px 34px;font-size:13px;color:var(--text);outline:none;font-family:'Plus Jakarta Sans',sans-serif;width:220px;transition:all 0.2s;font-weight:500;}
+.search-input:focus{border-color:rgba(26,111,240,0.4);background:#fff;box-shadow:0 0 0 3px rgba(26,111,240,0.08);}
+.search-input::placeholder{color:var(--muted2);}
+.online-tag{padding:6px 13px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;gap:5px;}
+.online-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+.notif-btn{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.15);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;transition:all 0.2s;}
+.notif-btn:hover{border-color:rgba(26,111,240,0.35);background:#fff;}
+.notif-count{position:absolute;top:-4px;right:-4px;width:17px;height:17px;background:var(--pink);border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+
+/* NOTIFICATIONS PANEL */
+.notif-panel{position:absolute;top:58px;right:28px;width:330px;background:rgba(255,255,255,0.97);border:1px solid rgba(26,111,240,0.15);border-radius:18px;box-shadow:var(--shadow2);z-index:999;display:none;overflow:hidden;backdrop-filter:blur(20px);}
+.notif-panel.open{display:block;animation:slideDown 0.2s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.notif-header{padding:14px 18px;border-bottom:1px solid rgba(26,111,240,0.1);display:flex;justify-content:space-between;align-items:center;}
+.notif-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--text);}
+.notif-clear{font-size:11px;color:var(--blue);cursor:pointer;font-weight:600;}
+.notif-item{padding:12px 18px;border-bottom:1px solid rgba(0,0,0,0.04);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:background 0.2s;}
+.notif-item:hover{background:rgba(26,111,240,0.04);}
+.notif-item:last-child{border-bottom:none;}
+.notif-ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.notif-text{font-size:12.5px;color:var(--text2);line-height:1.5;}
+.notif-time{font-size:11px;color:var(--muted2);margin-top:2px;}
+
+/* CONTENT */
+.content{padding:28px;}
+.section{display:none;animation:fadeIn 0.35s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* GRIDS */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px;}
+
+/* HERO */
+.hero{border-radius:24px;padding:36px 40px;margin-bottom:26px;position:relative;overflow:hidden;background:linear-gradient(130deg,#fff 0%,rgba(219,238,255,0.9) 60%,rgba(186,220,255,0.8) 100%);border:1px solid rgba(255,255,255,0.9);box-shadow:var(--shadow2);}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(26,111,240,0.08),transparent 70%);border-radius:50%;pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-40px;right:120px;width:200px;height:200px;background:radial-gradient(circle,rgba(14,165,233,0.07),transparent 70%);border-radius:50%;pointer-events:none;}
+.hero-tag{font-size:11px;color:var(--blue);letter-spacing:3px;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:8px;font-weight:700;}
+.hero-tag::before{content:'';display:inline-block;width:22px;height:2px;background:var(--blue);border-radius:2px;}
+.hero-title{font-family:'Outfit',sans-serif;font-size:32px;font-weight:900;line-height:1.15;margin-bottom:12px;color:var(--text);}
+.hero-title em{color:var(--blue);font-style:normal;background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:14.5px;color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:24px;}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-hero{padding:11px 24px;border-radius:11px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:700;transition:all 0.25s;}
+.btn-hero.primary{background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;box-shadow:0 4px 16px rgba(26,111,240,0.35);}
+.btn-hero.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,111,240,0.4);}
+.btn-hero.secondary{background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,111,240,0.2);color:var(--text);}
+.btn-hero.secondary:hover{border-color:rgba(26,111,240,0.4);background:#fff;color:var(--blue);}
+.hero-stats{display:flex;gap:32px;margin-top:26px;}
+.hs{text-align:left;}
+.hs-n{font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;}
+.hs-l{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* CARDS */
+.card{background:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.9);border-radius:var(--radius);padding:22px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(15,39,68,0.06);}
+.card:hover{border-color:rgba(26,111,240,0.25);transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,39,68,0.12);background:rgba(255,255,255,0.9);}
+.c-ico{font-size:28px;margin-bottom:13px;display:block;}
+.c-title{font-family:'Outfit',sans-serif;font-size:15.5px;font-weight:800;margin-bottom:6px;color:var(--text);}
+.c-desc{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:15px;}
+.c-tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(26,111,240,0.1);color:var(--blue);border:1px solid rgba(26,111,240,0.18);}
+
+/* STATS */
+.stat{background:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.9);border-radius:15px;padding:18px;backdrop-filter:blur(10px);box-shadow:0 2px 12px rgba(15,39,68,0.06);}
+.stat-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;font-weight:700;}
+.stat-n{font-family:'Outfit',sans-serif;font-size:28px;font-weight:900;}
+.stat-s{font-size:12px;color:var(--muted);margin-top:3px;}
+.stat-bar{height:4px;border-radius:3px;margin-top:12px;background:rgba(15,39,68,0.08);}
+.stat-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+
+/* SECTION HEADERS */
+.sh{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;margin-bottom:6px;color:var(--text);}
+.ss{font-size:13.5px;color:var(--muted);margin-bottom:22px;font-weight:500;}
+
+/* DSA */
+.dsa-progress-ring{position:relative;width:82px;height:82px;flex-shrink:0;}
+.dsa-progress-ring svg{transform:rotate(-90deg);}
+.dsa-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.dsa-ring-num{font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;color:var(--blue);}
+.dsa-ring-label{font-size:9px;color:var(--muted);font-weight:600;}
+.dsa-table{width:100%;border-collapse:collapse;}
+.dsa-table thead tr{border-bottom:1px solid rgba(26,111,240,0.12);}
+.dsa-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;padding:0 14px 11px;text-align:left;font-weight:700;}
+.dsa-table td{padding:12px 14px;border-bottom:1px solid rgba(15,39,68,0.05);font-size:13px;vertical-align:middle;}
+.dsa-table tr:hover td{background:rgba(26,111,240,0.03);}
+.dsa-check{width:19px;height:19px;border-radius:5px;border:1.5px solid rgba(26,111,240,0.35);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.dsa-check.done{background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.5);}
+.dsa-check.done::after{content:'✓';font-size:11px;color:var(--green);font-weight:700;}
+.diff-badge{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;}
+.diff-easy{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+.diff-medium{background:rgba(245,158,11,0.1);color:var(--gold);border:1px solid rgba(245,158,11,0.2);}
+.diff-hard{background:rgba(236,72,153,0.1);color:var(--pink);border:1px solid rgba(236,72,153,0.2);}
+.prob-link{color:var(--blue);text-decoration:none;font-size:12px;opacity:0.7;font-weight:600;}
+.prob-link:hover{opacity:1;}
+.topic-pill{padding:3px 10px;border-radius:6px;font-size:11px;background:rgba(26,111,240,0.07);color:var(--muted);font-weight:600;}
+.dsa-tabs{display:flex;gap:0;margin-bottom:16px;background:rgba(255,255,255,0.7);border:1px solid rgba(26,111,240,0.12);border-radius:11px;padding:3px;overflow-x:auto;}
+.dsa-tab{flex:1;padding:7px;text-align:center;font-size:12px;cursor:pointer;border-radius:9px;transition:all 0.2s;color:var(--muted);white-space:nowrap;font-weight:600;}
+.dsa-tab.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(26,111,240,0.15);}
+
+/* STREAK */
+.streak-section{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(251,191,36,0.05));border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:26px;margin-bottom:22px;}
+.streak-big{font-family:'Outfit',sans-serif;font-size:58px;font-weight:900;color:var(--gold);line-height:1;}
+.cal-cell{height:28px;border-radius:6px;background:rgba(15,39,68,0.06);cursor:pointer;transition:all 0.2s;}
+.cal-cell.done{background:rgba(245,158,11,0.3);border:1px solid rgba(245,158,11,0.5);}
+.cal-cell.today{border:2px solid var(--gold);box-shadow:0 0 8px rgba(245,158,11,0.3);}
+.cal-cell:hover{transform:scale(1.1);}
+
+/* ROADMAP */
+.rm-track{position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--blue),var(--cyan),var(--green));opacity:0.25;}
+.rm-item{position:relative;padding-left:62px;margin-bottom:26px;}
+.rm-node{position:absolute;left:16px;top:0;width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid;transition:all 0.3s;cursor:pointer;}
+.rm-node.done{background:rgba(16,185,129,0.15);border-color:var(--green);color:var(--green);}
+.rm-node.current{background:rgba(26,111,240,0.15);border-color:var(--blue);color:var(--blue);animation:rmPulse 2s infinite;}
+.rm-node.locked{background:rgba(15,39,68,0.06);border-color:rgba(15,39,68,0.15);color:var(--muted2);}
+@keyframes rmPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,111,240,0.3)}50%{box-shadow:0 0 0 9px rgba(26,111,240,0)}}
+.rm-card{background:rgba(255,255,255,0.75);border:1px solid rgba(26,111,240,0.1);border-radius:15px;padding:17px 20px;transition:all 0.2s;cursor:pointer;box-shadow:0 2px 10px rgba(15,39,68,0.06);}
+.rm-card:hover{border-color:rgba(26,111,240,0.25);box-shadow:var(--shadow);}
+.rm-card.done{border-color:rgba(16,185,129,0.25);}
+.rm-card.current{border-color:rgba(26,111,240,0.3);background:rgba(26,111,240,0.04);}
+.rm-title{font-size:14.5px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:9px;color:var(--text);}
+.rm-sub{font-size:12.5px;color:var(--muted);line-height:1.65;}
+.rm-pbar{height:4px;border-radius:3px;background:rgba(15,39,68,0.07);margin-top:11px;overflow:hidden;}
+.rm-pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width 1s ease;}
+.rm-meta{display:flex;gap:16px;margin-top:9px;}
+.rm-met{font-size:11.5px;color:var(--muted);font-weight:600;}
+
+/* MOCK INTERVIEW */
+.mock-hero{background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(26,111,240,0.07));border:1px solid rgba(139,92,246,0.2);border-radius:20px;padding:28px;margin-bottom:22px;}
+.mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.mock-card{background:rgba(255,255,255,0.8);border:1px solid rgba(139,92,246,0.15);border-radius:15px;padding:20px;cursor:pointer;transition:all 0.3s;text-align:center;box-shadow:0 2px 12px rgba(15,39,68,0.06);}
+.mock-card:hover{border-color:rgba(139,92,246,0.4);transform:translateY(-4px);box-shadow:0 12px 32px rgba(139,92,246,0.15);}
+.mock-ico{font-size:32px;margin-bottom:11px;}
+.mock-name{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px;color:var(--text);}
+.mock-desc{font-size:12.5px;color:var(--muted);}
+.mock-dur{font-size:11px;color:var(--purple);margin-top:9px;font-weight:700;}
+.interview-room{display:none;background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.15);border-radius:20px;overflow:hidden;box-shadow:var(--shadow2);}
+.ir-topbar{padding:16px 22px;border-bottom:1px solid rgba(26,111,240,0.1);display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.9);}
+.ir-recording{width:10px;height:10px;border-radius:50%;background:var(--pink);animation:blink 1s infinite;}
+.ir-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--text);}
+.ir-timer{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:var(--blue);}
+.ir-q-area{padding:28px 34px;}
+.ir-q-num{font-size:11px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+.ir-q-text{font-size:19px;font-weight:700;line-height:1.45;margin-bottom:24px;color:var(--text);}
+.ir-tips{background:rgba(26,111,240,0.07);border:1px solid rgba(26,111,240,0.15);border-radius:11px;padding:13px 17px;margin-bottom:22px;}
+.ir-tips-title{font-size:11px;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-weight:800;}
+.ir-tips-text{font-size:13px;color:var(--muted);line-height:1.65;}
+.ir-textarea{width:100%;background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,111,240,0.15);border-radius:12px;padding:14px 17px;font-size:13.5px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;min-height:100px;outline:none;transition:border 0.2s;}
+.ir-textarea:focus{border-color:rgba(26,111,240,0.4);background:#fff;box-shadow:0 0 0 3px rgba(26,111,240,0.08);}
+.ir-actions{padding:0 34px 26px;display:flex;gap:10px;}
+.ir-btn{padding:10px 24px;border-radius:11px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:700;transition:all 0.2s;}
+.ir-btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;box-shadow:0 4px 14px rgba(26,111,240,0.3);}
+.ir-btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,111,240,0.4);}
+.ir-btn.ghost{background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,111,240,0.15);color:var(--text);}
+.ir-feedback{padding:22px 34px;border-top:1px solid rgba(26,111,240,0.1);display:none;background:rgba(16,185,129,0.03);}
+.ir-fb-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;margin-bottom:10px;color:var(--green);}
+.ir-fb-text{font-size:13.5px;color:var(--muted);line-height:1.7;}
+.score-stars{font-size:22px;margin-bottom:9px;}
+
+/* WEBCAM INTERVIEW */
+.webcam-container{background:rgba(15,39,68,0.97);border-radius:20px;overflow:hidden;margin-bottom:20px;}
+.webcam-header{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+.webcam-dot{width:10px;height:10px;border-radius:50%;background:#ef4444;animation:blink 1s infinite;}
+.webcam-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:#fff;}
+.webcam-timer{margin-left:auto;font-family:'JetBrains Mono',monospace;color:#0ea5e9;font-size:16px;font-weight:700;}
+.webcam-body{display:grid;grid-template-columns:2fr 1fr;gap:0;}
+.webcam-video-wrap{position:relative;background:#000;aspect-ratio:16/9;}
+#webcamVideo{width:100%;height:100%;object-fit:cover;display:block;}
+.webcam-overlay{position:absolute;inset:0;pointer-events:none;}
+.face-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:160px;height:180px;border:2px dashed rgba(26,111,240,0.6);border-radius:50%;animation:guidePulse 2s infinite;}
+@keyframes guidePulse{0%,100%{border-color:rgba(26,111,240,0.4);box-shadow:0 0 0 0 rgba(26,111,240,0.2)}50%{border-color:rgba(26,111,240,0.8);box-shadow:0 0 0 8px rgba(26,111,240,0)}}
+.confidence-meter{position:absolute;bottom:16px;left:16px;right:16px;}
+.cm-label{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-weight:700;}
+.cm-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.15);overflow:hidden;}
+.cm-fill{height:100%;border-radius:3px;transition:width 0.5s ease;background:linear-gradient(90deg,#10b981,#0ea5e9);}
+.webcam-metrics{padding:16px;background:rgba(0,0,0,0.4);}
+.wm-item{margin-bottom:12px;}
+.wm-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:700;}
+.wm-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#fff;}
+.wm-val.good{color:var(--green);}
+.wm-val.avg{color:var(--gold);}
+.wm-val.poor{color:var(--pink);}
+.webcam-sidebar{background:rgba(0,0,0,0.6);padding:20px;display:flex;flex-direction:column;gap:14px;}
+.webcam-q-panel{flex:1;}
+.wq-num{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+.wq-text{font-size:13.5px;color:#fff;line-height:1.5;font-weight:500;}
+.wq-tip{background:rgba(26,111,240,0.15);border:1px solid rgba(26,111,240,0.3);border-radius:9px;padding:10px 12px;margin-top:10px;}
+.wq-tip-text{font-size:11.5px;color:rgba(255,255,255,0.7);line-height:1.5;}
+.webcam-controls{display:flex;gap:8px;flex-wrap:wrap;}
+.wc-btn{padding:8px 16px;border-radius:9px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:all 0.2s;}
+.wc-btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;}
+.wc-btn.danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;}
+.wc-btn.ghost{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;}
+
+/* ATS CHECKER */
+.ats-container{background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.15);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);}
+.ats-header{padding:22px 26px;border-bottom:1px solid rgba(26,111,240,0.1);background:linear-gradient(135deg,rgba(26,111,240,0.06),rgba(14,165,233,0.04));}
+.ats-body{padding:24px 26px;}
+.ats-upload{border:2px dashed rgba(26,111,240,0.25);border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(26,111,240,0.03);}
+.ats-upload:hover{border-color:rgba(26,111,240,0.45);background:rgba(26,111,240,0.06);}
+.ats-upload-ico{font-size:40px;margin-bottom:12px;}
+.ats-upload-text{font-size:14px;color:var(--muted);margin-bottom:8px;}
+.ats-upload-sub{font-size:12px;color:var(--muted2);}
+.ats-textarea{width:100%;background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,111,240,0.15);border-radius:12px;padding:14px 17px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;min-height:150px;outline:none;transition:border 0.2s;margin-top:14px;}
+.ats-textarea:focus{border-color:rgba(26,111,240,0.4);background:#fff;}
+.ats-score-ring{position:relative;width:120px;height:120px;margin:0 auto 20px;}
+.ats-score-ring svg{transform:rotate(-90deg);}
+.ats-score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ats-score-num{font-family:'Outfit',sans-serif;font-size:28px;font-weight:900;}
+.ats-score-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.ats-result-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid rgba(26,111,240,0.07);}
+.ats-result-item:last-child{border-bottom:none;}
+.ats-result-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ats-result-text{font-size:13px;color:var(--text);}
+.ats-result-status{margin-left:auto;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.status-pass{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+.status-warn{background:rgba(245,158,11,0.1);color:var(--gold);border:1px solid rgba(245,158,11,0.2);}
+.status-fail{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+
+/* JOB ROLES */
+.role-card{background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.1);border-radius:16px;padding:20px;transition:all 0.3s;cursor:pointer;box-shadow:0 2px 10px rgba(15,39,68,0.06);}
+.role-card:hover{transform:translateY(-4px);border-color:rgba(26,111,240,0.25);box-shadow:var(--shadow2);}
+.role-icon{font-size:30px;margin-bottom:10px;}
+.role-name{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px;color:var(--text);}
+.role-domain{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.role-desc{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+.role-skills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.skill-tag{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(26,111,240,0.08);color:var(--blue);}
+.role-salary{font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;display:inline-block;}
+.role-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(26,111,240,0.1);}
+.role-detail.open{display:block;}
+.role-detail-row{display:flex;gap:8px;margin-bottom:7px;font-size:12.5px;color:var(--muted);}
+.role-detail-row::before{content:'→';color:var(--blue);flex-shrink:0;}
+
+/* APTITUDE */
+.quiz-wrap{background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.12);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);}
+.quiz-top{padding:19px 24px;border-bottom:1px solid rgba(26,111,240,0.1);display:flex;align-items:center;justify-content:space-between;}
+.quiz-progress-bar{height:4px;background:rgba(26,111,240,0.08);position:relative;}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width 0.5s ease;}
+.q-area{padding:28px 32px;}
+.q-cat{font-size:11px;color:var(--blue);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:9px;font-weight:800;}
+.q-txt{font-size:18px;font-weight:700;line-height:1.5;margin-bottom:24px;color:var(--text);}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.q-opt{padding:13px 17px;border-radius:13px;border:1.5px solid rgba(26,111,240,0.12);background:rgba(255,255,255,0.8);cursor:pointer;font-size:13.5px;transition:all 0.2s;text-align:left;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;}
+.q-opt:hover{border-color:rgba(26,111,240,0.35);background:rgba(26,111,240,0.06);}
+.q-opt.correct{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.08);color:var(--green);font-weight:700;}
+.q-opt.wrong{border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.06);color:var(--red);}
+.q-expl{margin-top:15px;padding:13px 17px;background:rgba(26,111,240,0.06);border:1px solid rgba(26,111,240,0.15);border-radius:11px;font-size:13px;color:var(--muted);display:none;font-weight:500;}
+.q-nav{padding:17px 32px;border-top:1px solid rgba(26,111,240,0.08);display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.5);}
+.q-dots{display:flex;gap:5px;}
+.q-dot{width:7px;height:7px;border-radius:50%;background:rgba(15,39,68,0.12);transition:all 0.3s;}
+.q-dot.done{background:var(--green);}
+.q-dot.current{background:var(--blue);transform:scale(1.35);}
+.q-dot.wrong-d{background:var(--red);}
+.result-card{padding:44px;text-align:center;display:none;}
+.result-emoji{font-size:60px;margin-bottom:16px;}
+.result-score{font-family:'Outfit',sans-serif;font-size:52px;font-weight:900;}
+.result-label{font-size:16px;color:var(--muted);margin-bottom:26px;font-weight:500;}
+.result-breakdown{display:flex;justify-content:center;gap:28px;margin-bottom:26px;}
+.rb-item{text-align:center;}
+.rb-n{font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;}
+.rb-l{font-size:12px;color:var(--muted);font-weight:600;}
+
+/* INTERVIEW Q&A */
+.qa-card{background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.1);border-radius:13px;margin-bottom:10px;overflow:hidden;transition:border 0.2s;box-shadow:0 2px 8px rgba(15,39,68,0.05);}
+.qa-card:hover{border-color:rgba(26,111,240,0.2);}
+.qa-q{padding:15px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--text);}
+.qa-chevron{color:var(--muted);font-size:11px;transition:transform 0.3s;flex-shrink:0;}
+.qa-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.3s;padding:0 20px;font-size:13px;color:var(--muted);line-height:1.8;}
+.qa-card.open .qa-a{max-height:300px;padding:0 20px 17px;border-top:1px solid rgba(26,111,240,0.08);}
+.qa-card.open .qa-chevron{transform:rotate(180deg);}
+.qa-tag{padding:2px 9px;border-radius:20px;font-size:10.5px;border:1px solid;margin-right:7px;flex-shrink:0;font-weight:700;}
+.qa-tag.hr{color:var(--blue);border-color:rgba(26,111,240,0.3);background:rgba(26,111,240,0.08);}
+.qa-tag.tech{color:var(--purple);border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.08);}
+
+/* RESUME */
+.tip-row{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(26,111,240,0.07);}
+.tip-row:last-child{border-bottom:none;}
+.tip-icon-box{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.tip-t{font-size:14px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.tip-d{font-size:12.5px;color:var(--muted);line-height:1.65;}
+.checklist-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(26,111,240,0.06);cursor:pointer;}
+.cl-box{width:19px;height:19px;border-radius:5px;border:1.5px solid rgba(26,111,240,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.cl-box.checked{background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.5);}
+.cl-box.checked::after{content:'✓';font-size:11px;color:var(--green);font-weight:800;}
+.cl-text{font-size:13px;transition:all 0.2s;font-weight:500;color:var(--text2);}
+
+/* COMPANIES */
+.co-card{background:rgba(255,255,255,0.82);border:1px solid rgba(26,111,240,0.1);border-radius:17px;padding:24px;transition:all 0.3s;box-shadow:0 2px 12px rgba(15,39,68,0.06);}
+.co-card:hover{border-color:rgba(26,111,240,0.25);transform:translateY(-3px);box-shadow:var(--shadow2);}
+.co-name{font-family:'Outfit',sans-serif;font-size:21px;font-weight:900;margin-bottom:2px;color:var(--text);}
+.co-sub{font-size:12px;color:var(--muted);margin-bottom:16px;font-weight:500;}
+.co-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(26,111,240,0.06);font-size:12.5px;}
+.co-row:last-child{border:none;}
+.co-k{color:var(--muted);font-weight:500;}
+.co-v{font-weight:700;color:var(--text2);}
+.pkg{padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+
+/* CHATBOT */
+.chat-fab{position:fixed;bottom:28px;right:28px;width:56px;height:56px;background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:200;font-size:23px;box-shadow:0 8px 28px rgba(26,111,240,0.4);transition:all 0.3s;}
+.chat-fab:hover{transform:scale(1.1);box-shadow:0 12px 36px rgba(26,111,240,0.5);}
+.chat-fab .cdot{position:absolute;top:-1px;right:-1px;width:13px;height:13px;background:var(--gold);border-radius:50%;border:2px solid var(--bg);animation:blink 2s infinite;}
+.chat-win{position:fixed;bottom:96px;right:28px;width:350px;background:rgba(255,255,255,0.97);border:1px solid rgba(26,111,240,0.15);border-radius:22px;overflow:hidden;z-index:200;display:none;flex-direction:column;box-shadow:0 24px 60px rgba(15,39,68,0.15);backdrop-filter:blur(24px);}
+.chat-win.open{display:flex;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ch-head{padding:15px 19px;border-bottom:1px solid rgba(26,111,240,0.1);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(26,111,240,0.07),rgba(14,165,233,0.04));}
+.ch-status{font-size:11px;color:var(--green);font-weight:700;}
+.ch-close{margin-left:auto;cursor:pointer;color:var(--muted);font-size:16px;}
+.ch-msgs{height:240px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;}
+.ch-m{max-width:84%;padding:10px 14px;border-radius:13px;font-size:13px;line-height:1.5;font-weight:500;}
+.ch-m.bot{background:rgba(26,111,240,0.08);border:1px solid rgba(26,111,240,0.15);align-self:flex-start;color:var(--text2);}
+.ch-m.user{background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;align-self:flex-end;}
+.ch-row{padding:11px 15px;border-top:1px solid rgba(26,111,240,0.08);display:flex;gap:8px;background:rgba(255,255,255,0.8);}
+.ch-input{flex:1;background:rgba(26,111,240,0.05);border:1.5px solid rgba(26,111,240,0.12);border-radius:10px;padding:8px 13px;font-size:13px;color:var(--text);outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;}
+.ch-input:focus{border-color:rgba(26,111,240,0.3);background:#fff;}
+.ch-send{background:linear-gradient(135deg,var(--blue),var(--blue3));border:none;border-radius:10px;padding:8px 15px;color:#fff;cursor:pointer;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;font-weight:700;}
+.ch-send:hover{transform:scale(1.05);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(255,255,255,0.97);border:1px solid rgba(26,111,240,0.15);border-radius:13px;padding:13px 22px;font-size:13.5px;z-index:9999;transition:transform 0.3s;backdrop-filter:blur(20px);display:flex;align-items:center;gap:9px;box-shadow:var(--shadow2);color:var(--text);font-weight:600;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(26,111,240,0.2);border-radius:3px;}
+
+/* WEBCAM STATUS BADGE */
+.cam-status{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;}
+.cam-active{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
+.cam-inactive{background:rgba(15,39,68,0.07);color:var(--muted);border:1px solid rgba(15,39,68,0.12);}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <div class="notif-title">Notifications</div>
+    <span class="notif-clear" onclick="clearNotifs()">Clear all</span>
+  </div>
+  <div id="notifList"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-wrap">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="logoplw.jpeg" 
+         alt="PlaceWise Logo" 
+         style="width:46px;height:46px;border-radius:11px;object-fit:contain;flex-shrink:0;box-shadow:0 2px 10px rgba(26,111,240,0.2);" />
+    <div>
+      <div class="logo"><span class="p">Place</span><span class="w">Wise</span></div>
+      <div class="logo-tagline">Ace the Prep</div>
+    </div>
+  </div>
+</div>
+  <div class="user-card">
+    <div class="u-av" id="avatarInit">S</div>
+    <div><div class="u-name" id="sidebarName">Student</div><div class="u-tag">Placement Aspirant</div></div>
+  </div>
+  <div class="streak-pill" onclick="showSection('streak',this)" title="View streak">
+    <span class="streak-fire">🔥</span>
+    <div><div class="streak-num" id="sideStreakNum">0</div><div class="streak-label">Day Streak</div></div>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-grp-label">Main</div>
+    <div class="nav-item active" onclick="showSection('home',this)"><span class="nav-ico">🏠</span>Home</div>
+    <div class="nav-item" onclick="showSection('dsa',this)"><span class="nav-ico">⚡</span>DSA Sheet<span class="nav-badge gold" id="dsaBadge">0</span></div>
+    <div class="nav-item" onclick="showSection('aptitude',this)"><span class="nav-ico">📊</span>Aptitude<span class="nav-badge">10</span></div>
+    <div class="nav-item" onclick="showSection('mock',this)"><span class="nav-ico">🎙️</span>Mock Interview<span class="nav-badge" style="background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3);">NEW</span></div>
+    <div class="nav-item" onclick="showSection('webcam',this)"><span class="nav-ico">📹</span>Webcam Interview<span class="nav-badge" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);">LIVE</span></div>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-grp-label">Tools</div>
+    <div class="nav-item" onclick="showSection('ats',this)"><span class="nav-ico">🤖</span>ATS Checker<span class="nav-badge" style="background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);">AI</span></div>
+    <div class="nav-item" onclick="showSection('roles',this)"><span class="nav-ico">💼</span>Job Roles</div>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-grp-label">Resources</div>
+    <div class="nav-item" onclick="showSection('roadmap',this)"><span class="nav-ico">🗺️</span>Roadmap<span class="notif-dot"></span></div>
+    <div class="nav-item" onclick="showSection('interview',this)"><span class="nav-ico">🎤</span>Interview Tips</div>
+    <div class="nav-item" onclick="showSection('resume',this)"><span class="nav-ico">📄</span>Resume</div>
+    <div class="nav-item" onclick="showSection('companies',this)"><span class="nav-ico">🏢</span>Companies</div>
+  </div>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="showToast('Logged out! Refresh to log back in.','🚪')">🚪 Logout</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title" id="pageTitle">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-wrap">
+        <span class="search-ico">🔍</span>
+        <input class="search-input" placeholder="Search topics..." onkeyup="doSearch(this.value)">
+      </div>
+      <button class="notif-btn" onclick="toggleNotif()">🔔<span class="notif-count" id="notifCount">3</span></button>
+      <div class="online-tag">Ready</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="section active" id="sec-home">
+      <div class="hero">
+        <div class="hero-tag">Welcome Back</div>
+        <div class="hero-title">Your <em>Placement Journey</em><br>Starts Here 🚀</div>
+        <div class="hero-sub">Track DSA progress, practice webcam mock interviews, check ATS scores — all in one beautifully designed dashboard.</div>
+        <div class="hero-actions">
+          <button class="btn-hero primary" onclick="showSection('dsa',getNav('dsa'))">Start DSA Sheet ⚡</button>
+          <button class="btn-hero secondary" onclick="showSection('webcam',getNav('webcam'))">Live Webcam Interview 📹</button>
+          <button class="btn-hero secondary" onclick="showSection('ats',getNav('ats'))">ATS Checker 🤖</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hs"><div class="hs-n" id="hsDone" style="color:var(--cyan)">0</div><div class="hs-l">DSA Solved</div></div>
+          <div class="hs"><div class="hs-n" id="hsStreak" style="color:var(--gold)">0</div><div class="hs-l">Day Streak 🔥</div></div>
+          <div class="hs"><div class="hs-n" style="color:var(--green)">6</div><div class="hs-l">Companies</div></div>
+          <div class="hs"><div class="hs-n" id="hsRoadmap" style="color:var(--purple)">0%</div><div class="hs-l">Roadmap Done</div></div>
+        </div>
+      </div>
+      <div class="g4">
+        <div class="card" onclick="showSection('dsa',getNav('dsa'))"><span class="c-ico">⚡</span><div class="c-title">Striver's DSA Sheet</div><div class="c-desc">180 curated problems to crack any product company</div><span class="c-tag" id="homeDSATag">0 / 180 done</span></div>
+        <div class="card" onclick="showSection('webcam',getNav('webcam'))"><span class="c-ico">📹</span><div class="c-title">Live Webcam Interview</div><div class="c-desc">Real-time confidence & eye contact analysis with webcam</div><span class="c-tag" style="background:rgba(239,68,68,0.08);color:var(--red);border-color:rgba(239,68,68,0.2);">LIVE AI</span></div>
+        <div class="card" onclick="showSection('ats',getNav('ats'))"><span class="c-ico">🤖</span><div class="c-title">ATS Resume Checker</div><div class="c-desc">Score your resume & get instant ATS compatibility feedback</div><span class="c-tag" style="background:rgba(16,185,129,0.1);color:var(--green);border-color:rgba(16,185,129,0.2);">AI Powered</span></div>
+        <div class="card" onclick="showSection('roles',getNav('roles'))"><span class="c-ico">💼</span><div class="c-title">Job Role Explorer</div><div class="c-desc">15+ career paths with skills, salary & growth roadmap</div><span class="c-tag" style="background:rgba(139,92,246,0.1);color:var(--purple);border-color:rgba(139,92,246,0.2);">15+ Roles</span></div>
+      </div>
+      <div class="g4">
+        <div class="stat"><div class="stat-l">DSA Progress</div><div class="stat-n" id="homeDSA" style="color:var(--blue)">0%</div><div class="stat-s">of 180 problems</div><div class="stat-bar"><div class="stat-fill" id="homeDSABar" style="background:linear-gradient(90deg,var(--blue),var(--cyan));width:0%"></div></div></div>
+        <div class="stat"><div class="stat-l">Roadmap</div><div class="stat-n" id="homeRM" style="color:var(--purple)">0%</div><div class="stat-s">milestones done</div><div class="stat-bar"><div class="stat-fill" id="homeRMBar" style="background:linear-gradient(90deg,var(--purple),#a78bfa);width:0%"></div></div></div>
+        <div class="stat"><div class="stat-l">Aptitude</div><div class="stat-n" style="color:var(--gold)">Quiz</div><div class="stat-s">Practice mode</div><div class="stat-bar"><div class="stat-fill" style="background:linear-gradient(90deg,var(--gold),#fbbf24);width:60%"></div></div></div>
+        <div class="stat"><div class="stat-l">Interview Ready</div><div class="stat-n" style="color:var(--green)">Go!</div><div class="stat-s">Tips & Webcam Mock</div><div class="stat-bar"><div class="stat-fill" style="background:linear-gradient(90deg,var(--green),#34d399);width:70%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- DSA SHEET -->
+    <div class="section" id="sec-dsa">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px;flex-wrap:wrap;">
+        <div><div class="sh">⚡ Striver's DSA Sheet</div><div class="ss">180 must-do problems — track your progress daily</div></div>
+        <div style="display:flex;align-items:center;gap:18px;">
+          <div class="dsa-progress-ring">
+            <svg width="82" height="82" viewBox="0 0 82 82">
+              <circle cx="41" cy="41" r="34" fill="none" stroke="rgba(26,111,240,0.1)" stroke-width="7"/>
+              <circle cx="41" cy="41" r="34" fill="none" stroke="url(#dsaGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="214" id="dsaRingPath" stroke-dashoffset="214" style="transition:stroke-dashoffset 1s ease;"/>
+              <defs><linearGradient id="dsaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--blue)"/><stop offset="100%" style="stop-color:var(--cyan)"/></linearGradient></defs>
+            </svg>
+            <div class="dsa-ring-text"><div class="dsa-ring-num" id="dsaRingNum">0</div><div class="dsa-ring-label">/ 180</div></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:600;">Filter by topic</div>
+            <button style="padding:8px 17px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;cursor:pointer;font-weight:700;" onclick="resetDSA()">Reset All</button>
+          </div>
+        </div>
+      </div>
+      <div class="dsa-tabs" id="dsaTabs"></div>
+      <div style="background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.1);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);">
+        <table class="dsa-table" id="dsaTable">
+          <thead><tr>
+            <th style="width:42px">✓</th><th>Problem</th><th>Topic</th><th>Difficulty</th><th>Practice</th>
+          </tr></thead>
+          <tbody id="dsaBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STREAK -->
+    <div class="section" id="sec-streak">
+      <div class="sh">🔥 Daily Streak</div>
+      <div class="ss">Build a consistent study habit — mark today as done!</div>
+      <div class="g2">
+        <div class="streak-section">
+          <div style="display:flex;align-items:center;gap:18px;">
+            <div>
+              <div style="font-size:11px;color:rgba(160,100,0,0.7);margin-bottom:5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;">Current Streak</div>
+              <div class="streak-big" id="streakBig">0</div>
+              <div style="font-size:13.5px;color:rgba(160,110,0,0.8);margin-top:5px;font-weight:600;">days in a row 🔥</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:44px;" id="streakEmoji">😴</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:5px;font-weight:600;" id="streakStatus">Start today!</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;margin-top:22px;">
+            <div><div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;" id="longestStreak">0</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Longest</div></div>
+            <div><div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;" id="totalDays">0</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total Days</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.12);border-radius:20px;padding:24px;box-shadow:var(--shadow);">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:5px;color:var(--text);">Today's Checklist</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:17px;font-weight:500;">Complete these to maintain your streak</div>
+          <div id="dailyChecklist"></div>
+          <button style="margin-top:17px;width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#f97316);color:#fff;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,0.3);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''" onclick="markTodayDone()">🔥 Mark Today as Done!</button>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.8);border:1px solid rgba(26,111,240,0.1);border-radius:18px;padding:22px;margin-bottom:22px;box-shadow:var(--shadow);">
+        <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:16px;color:var(--text);">📅 Activity Calendar — Last 35 Days</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:9px;" id="calLabels"></div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;" id="calGrid"></div>
+        <div style="display:flex;gap:12px;margin-top:14px;align-items:center;font-size:11px;color:var(--muted);font-weight:600;">
+          <span>Less</span>
+          <div style="width:14px;height:14px;border-radius:4px;background:rgba(15,39,68,0.07);"></div>
+          <div style="width:14px;height:14px;border-radius:4px;background:rgba(245,158,11,0.4);"></div>
+          <div style="width:14px;height:14px;border-radius:4px;background:var(--gold);"></div>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="section" id="sec-roadmap">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;">
+        <div><div class="sh">🗺️ Placement Roadmap</div><div class="ss">Click milestones to mark them complete</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.12);border-radius:13px;padding:13px 20px;text-align:center;box-shadow:var(--shadow);">
+          <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;color:var(--green);" id="rmPct">0%</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;">Complete</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.82);border:1px solid rgba(26,111,240,0.1);border-radius:18px;padding:26px 30px;box-shadow:var(--shadow);">
+        <div style="position:relative;"><div class="rm-track"></div><div id="roadmapItems"></div></div>
+      </div>
+    </div>
+
+    <!-- MOCK INTERVIEW -->
+    <div class="section" id="sec-mock">
+      <div class="mock-hero">
+        <div style="font-family:'Outfit',sans-serif;font-size:25px;font-weight:900;color:var(--text);">🎙️ Mock Interview Simulator</div>
+        <div style="font-size:13.5px;color:var(--muted);margin-top:6px;margin-bottom:22px;font-weight:500;">Practice real interview scenarios with instant feedback. Build confidence before the real thing!</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="padding:7px 15px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(139,92,246,0.1);color:var(--purple);border:1px solid rgba(139,92,246,0.2);">⏱️ Timed responses</div>
+          <div style="padding:7px 15px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(16,185,129,0.08);color:var(--green);border:1px solid rgba(16,185,129,0.18);">💡 Instant feedback</div>
+          <div style="padding:7px 15px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(26,111,240,0.08);color:var(--blue);border:1px solid rgba(26,111,240,0.18);">📊 Score per answer</div>
+        </div>
+      </div>
+      <div class="mock-grid" id="mockModeGrid">
+        <div class="mock-card" onclick="startMock('hr')"><div class="mock-ico">👔</div><div class="mock-name">HR Interview</div><div class="mock-desc">Behavioral questions, company fit, career goals</div><div class="mock-dur">⏱ 5 questions · ~10 min</div></div>
+        <div class="mock-card" onclick="startMock('technical')"><div class="mock-ico">💻</div><div class="mock-name">Technical Round</div><div class="mock-desc">DSA, CS fundamentals, problem solving</div><div class="mock-dur">⏱ 5 questions · ~15 min</div></div>
+        <div class="mock-card" onclick="startMock('managerial')"><div class="mock-ico">📈</div><div class="mock-name">Managerial Round</div><div class="mock-desc">Leadership, teamwork, situational judgment</div><div class="mock-dur">⏱ 5 questions · ~12 min</div></div>
+      </div>
+      <div class="interview-room" id="interviewRoom">
+        <div class="ir-topbar">
+          <div class="ir-recording"></div>
+          <div class="ir-title" id="irTitle">HR Interview</div>
+          <div style="font-size:12px;color:var(--muted);margin-left:8px;font-weight:600;" id="irQCount">Q 1/5</div>
+          <div class="ir-timer" id="irTimer">02:00</div>
+        </div>
+        <div class="ir-q-area">
+          <div class="ir-q-num" id="irQNum">QUESTION 1 OF 5</div>
+          <div class="ir-q-text" id="irQText">Loading question...</div>
+          <div class="ir-tips"><div class="ir-tips-title">💡 Tip</div><div class="ir-tips-text" id="irTip">Use the STAR method</div></div>
+          <textarea class="ir-textarea" id="irAnswer" placeholder="Type your answer here..."></textarea>
+        </div>
+        <div class="ir-actions">
+          <button class="ir-btn primary" onclick="submitMockAnswer()">Submit Answer →</button>
+          <button class="ir-btn ghost" onclick="skipMockQ()">Skip</button>
+          <button class="ir-btn ghost" onclick="endMock()" style="margin-left:auto;color:var(--red);border-color:rgba(239,68,68,0.25);">End</button>
+        </div>
+        <div class="ir-feedback" id="irFeedback">
+          <div class="score-stars" id="irStars"></div>
+          <div class="ir-fb-title" id="irFbTitle">Good Answer!</div>
+          <div class="ir-fb-text" id="irFbText"></div>
+          <button class="ir-btn primary" style="margin-top:15px;" id="irNextBtn" onclick="nextMockQ()">Next Question →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBCAM INTERVIEW -->
+    <div class="section" id="sec-webcam">
+      <div class="sh">📹 Live Webcam Interview</div>
+      <div class="ss">Real camera practice — get confidence score, posture & eye contact feedback</div>
+
+      <div style="background:rgba(255,255,255,0.82);border:1px solid rgba(26,111,240,0.12);border-radius:20px;padding:22px;margin-bottom:20px;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">Choose Interview Mode</div>
+            <div style="font-size:12.5px;color:var(--muted);">Your webcam will be used for confidence analysis</div>
+          </div>
+          <div id="camStatusBadge" class="cam-status cam-inactive">● Camera Off</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;" id="webcamModeGrid">
+          <div class="mock-card" onclick="selectWebcamMode('hr',this)" style="padding:14px;">
+            <div style="font-size:22px;margin-bottom:6px;">👔</div>
+            <div style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--text);">HR Round</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Behavioral · 5 Qs</div>
+          </div>
+          <div class="mock-card" onclick="selectWebcamMode('technical',this)" style="padding:14px;">
+            <div style="font-size:22px;margin-bottom:6px;">💻</div>
+            <div style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--text);">Technical</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">DSA & CS · 5 Qs</div>
+          </div>
+          <div class="mock-card" onclick="selectWebcamMode('managerial',this)" style="padding:14px;">
+            <div style="font-size:22px;margin-bottom:6px;">📈</div>
+            <div style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--text);">Managerial</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Leadership · 5 Qs</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="ir-btn primary" onclick="startWebcamInterview()" id="startWebcamBtn">📹 Start Live Interview</button>
+          <button class="ir-btn ghost" onclick="stopWebcam()" id="stopWebcamBtn" style="display:none;">⏹ Stop Camera</button>
+          <span style="font-size:12px;color:var(--muted);">⚠️ Camera access required</span>
+        </div>
+      </div>
+
+      <div class="webcam-container" id="webcamRoom" style="display:none;">
+        <div class="webcam-header">
+          <div class="webcam-dot"></div>
+          <div class="webcam-title" id="webcamTitle">HR Live Interview</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-left:8px;font-weight:600;" id="webcamQCount">Q 1/5</div>
+          <div class="webcam-timer" id="webcamTimer">03:00</div>
+        </div>
+        <div class="webcam-body">
+          <div class="webcam-video-wrap">
+            <video id="webcamVideo" autoplay muted playsinline></video>
+            <div class="webcam-overlay">
+              <div class="face-guide"></div>
+              <div class="confidence-meter">
+                <div class="cm-label">Confidence Score</div>
+                <div class="cm-bar"><div class="cm-fill" id="confidenceFill" style="width:0%"></div></div>
+                <div style="display:flex;justify-content:space-between;margin-top:3px;">
+                  <span style="font-size:10px;color:rgba(255,255,255,0.5);">0%</span>
+                  <span style="font-size:11px;color:#fff;font-weight:700;" id="confidenceVal">--</span>
+                  <span style="font-size:10px;color:rgba(255,255,255,0.5);">100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="webcam-sidebar">
+            <div class="webcam-q-panel">
+              <div class="wq-num" id="webcamQNum">QUESTION 1 OF 5</div>
+              <div class="wq-text" id="webcamQText">Preparing question...</div>
+              <div class="wq-tip"><div class="wq-tip-text" id="webcamQTip">💡 Use the STAR method</div></div>
+            </div>
+            <div>
+              <div style="margin-bottom:10px;">
+                <div class="wm-label">Eye Contact</div>
+                <div class="wm-val" id="eyeContactVal">--</div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <div class="wm-label">Posture</div>
+                <div class="wm-val" id="postureVal">--</div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <div class="wm-label">Time Elapsed</div>
+                <div class="wm-val" id="elapsedVal">0:00</div>
+              </div>
+            </div>
+            <div class="webcam-controls">
+              <button class="wc-btn primary" onclick="nextWebcamQ()">Next Q →</button>
+              <button class="wc-btn ghost" onclick="skipWebcamQ()">Skip</button>
+              <button class="wc-btn danger" onclick="endWebcamInterview()">End</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webcam Results -->
+      <div id="webcamResults" style="display:none;background:rgba(255,255,255,0.85);border:1px solid rgba(26,111,240,0.12);border-radius:20px;padding:32px;text-align:center;box-shadow:var(--shadow);">
+        <div style="font-size:52px;margin-bottom:12px;" id="webcamResultEmoji">🎉</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;color:var(--blue);margin-bottom:6px;" id="webcamResultScore">0%</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:28px;font-weight:500;">Overall Interview Score</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+          <div style="background:rgba(26,111,240,0.06);border:1px solid rgba(26,111,240,0.12);border-radius:14px;padding:16px;">
+            <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--blue);" id="wRes1">--</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:700;">Confidence</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:14px;padding:16px;">
+            <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--green);" id="wRes2">--</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:700;">Eye Contact</div>
+          </div>
+          <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:16px;">
+            <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--purple);" id="wRes3">--</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:700;">Posture</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:14px;padding:16px;">
+            <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--gold);" id="wRes4">--</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;font-weight:700;">Duration</div>
+          </div>
+        </div>
+        <div style="background:rgba(26,111,240,0.05);border:1px solid rgba(26,111,240,0.1);border-radius:14px;padding:18px;text-align:left;margin-bottom:22px;">
+          <div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;margin-bottom:10px;color:var(--text);">AI Feedback</div>
+          <div id="webcamFeedbackText" style="font-size:13.5px;color:var(--muted);line-height:1.7;"></div>
+        </div>
+        <button class="ir-btn primary" onclick="resetWebcam()">🔄 Try Again</button>
+      </div>
+    </div>
+
+    <!-- ATS CHECKER -->
+    <div class="section" id="sec-ats">
+      <div class="sh">🤖 ATS Resume Checker</div>
+      <div class="ss">Paste your resume text to get an instant ATS compatibility score with detailed feedback</div>
+      <div class="ats-container">
+        <div class="ats-header">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:var(--text);">Applicant Tracking System Analyzer</div>
+              <div style="font-size:12.5px;color:var(--muted);margin-top:3px;">Instantly score your resume against ATS criteria used by top companies</div>
+            </div>
+            <div style="margin-left:auto;padding:6px 14px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);font-size:11px;font-weight:800;color:var(--green);">AI Powered</div>
+          </div>
+        </div>
+        <div class="ats-body" id="atsInput">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px;">📋 Paste Resume Text</div>
+              <textarea class="ats-textarea" id="atsResumeText" placeholder="Paste your complete resume text here... Include your skills, experience, education, and projects.
+
+Example:
+John Doe
+john@email.com | LinkedIn | GitHub
+
+SKILLS: Python, JavaScript, React, Node.js, SQL, Git
+
+EXPERIENCE:
+Software Intern | Company Name | 2023
+- Built REST APIs using Python Flask, reducing response time by 30%
+- Implemented CI/CD pipeline...
+
+EDUCATION:
+B.Tech Computer Science | University | 2024
+CGPA: 8.5/10
+
+PROJECTS:
+E-commerce Platform | React, Node.js, MongoDB
+- Full-stack web app with 500+ users"></textarea>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px;">🎯 Target Job Description (Optional)</div>
+              <textarea class="ats-textarea" id="atsJobText" placeholder="Paste the job description here to check keyword match...
+
+Example:
+We're looking for a Software Engineer with:
+- 1+ years experience in Python/Java
+- Knowledge of data structures & algorithms
+- Experience with REST APIs
+- Familiarity with cloud services (AWS/GCP)
+- Strong problem-solving skills"></textarea>
+            </div>
+          </div>
+          <button class="ir-btn primary" onclick="runATSCheck()" style="width:100%;padding:13px;font-size:14px;">🤖 Analyze My Resume</button>
+        </div>
+        <div id="atsResults" style="display:none;">
+          <div style="padding:28px;border-top:1px solid rgba(26,111,240,0.1);">
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:28px;align-items:start;">
+              <div style="text-align:center;">
+                <div class="ats-score-ring">
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(26,111,240,0.1)" stroke-width="10"/>
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="url(#atsGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" id="atsRingPath" stroke-dashoffset="314" style="transition:stroke-dashoffset 1.5s ease;"/>
+                    <defs><linearGradient id="atsGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient></defs>
+                  </svg>
+                  <div class="ats-score-text">
+                    <div class="ats-score-num" id="atsScoreNum" style="color:var(--green)">--</div>
+                    <div class="ats-score-label">ATS Score</div>
+                  </div>
+                </div>
+                <div style="font-size:13px;color:var(--muted);font-weight:600;" id="atsScoreLabel">Analyzing...</div>
+                <button class="ir-btn ghost" onclick="resetATS()" style="margin-top:14px;width:100%;font-size:12px;">🔄 Check Another</button>
+              </div>
+              <div>
+                <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:14px;color:var(--text);">Detailed Analysis</div>
+                <div id="atsResultItems"></div>
+              </div>
+            </div>
+            <div style="margin-top:22px;background:rgba(26,111,240,0.05);border:1px solid rgba(26,111,240,0.1);border-radius:14px;padding:18px;">
+              <div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;margin-bottom:10px;color:var(--text);">💡 Improvement Suggestions</div>
+              <div id="atsSuggestions" style="font-size:13px;color:var(--muted);line-height:1.8;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOB ROLES -->
+    <div class="section" id="sec-roles">
+      <div class="sh">💼 Job Role Explorer</div>
+      <div class="ss">Explore 15+ career paths — skills, salary, growth & how to get there</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="roleFilterBtns"></div>
+      <div class="g3" id="rolesGrid"></div>
+    </div>
+
+    <!-- APTITUDE -->
+    <div class="section" id="sec-aptitude">
+      <div class="sh">📊 Aptitude Practice</div>
+      <div class="ss">Test your quantitative and logical reasoning</div>
+      <div class="quiz-wrap">
+        <div class="quiz-top">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--text);">Quiz Mode</div>
+          <div style="font-size:13.5px;color:var(--muted);font-weight:600;" id="quizQLabel">Q 1 / 10</div>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qpfill" style="width:10%"></div></div>
+        <div class="q-area" id="qArea"></div>
+        <div class="q-nav">
+          <div class="q-dots" id="qDots"></div>
+          <div style="font-size:13.5px;color:var(--muted);font-weight:600;">Score: <span id="qScore" style="color:var(--blue);font-weight:800;">0</span></div>
+        </div>
+        <div class="result-card" id="resultCard">
+          <div class="result-emoji" id="resultEmoji">🎉</div>
+          <div class="result-score" id="resultScore" style="color:var(--blue)"></div>
+          <div class="result-label" id="resultLabel"></div>
+          <div class="result-breakdown">
+            <div class="rb-item"><div class="rb-n" id="rbCorrect" style="color:var(--green)">0</div><div class="rb-l">Correct</div></div>
+            <div class="rb-item"><div class="rb-n" id="rbWrong" style="color:var(--red)">0</div><div class="rb-l">Wrong</div></div>
+            <div class="rb-item"><div class="rb-n" id="rbTime" style="color:var(--gold)">0s</div><div class="rb-l">Avg Time</div></div>
+          </div>
+          <button class="ir-btn primary" onclick="startQuiz()">🔄 Try Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERVIEW TIPS -->
+    <div class="section" id="sec-interview">
+      <div class="sh">🎤 Interview Preparation</div>
+      <div class="ss">Curated Q&As with expert answers — click to expand</div>
+      <div class="g2" style="margin-bottom:22px;">
+        <div style="background:rgba(26,111,240,0.07);border:1px solid rgba(26,111,240,0.15);border-radius:15px;padding:20px;">
+          <div style="font-size:24px;margin-bottom:9px;">🎯</div>
+          <div style="font-size:14.5px;font-weight:800;margin-bottom:6px;color:var(--text);">STAR Method</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65;"><b style="color:var(--blue)">S</b>ituation · <b style="color:var(--blue)">T</b>ask · <b style="color:var(--blue)">A</b>ction · <b style="color:var(--blue)">R</b>esult — The golden framework for all behavioral answers.</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:15px;padding:20px;">
+          <div style="font-size:24px;margin-bottom:9px;">✅</div>
+          <div style="font-size:14.5px;font-weight:800;margin-bottom:6px;color:var(--text);">Golden Rules</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65;">Research company beforehand. Arrive early. Firm handshake. Ask 2-3 smart questions at end. Follow up via email.</div>
+        </div>
+      </div>
+      <div id="qaList"></div>
+    </div>
+
+    <!-- RESUME -->
+    <div class="section" id="sec-resume">
+      <div class="sh">📄 Resume Builder Tips</div>
+      <div class="ss">Craft a resume that gets you shortlisted in 6 seconds</div>
+      <div class="g2">
+        <div style="background:rgba(255,255,255,0.82);border:1px solid rgba(26,111,240,0.1);border-radius:18px;padding:24px;box-shadow:var(--shadow);">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:16px;color:var(--text);">Pro Tips</div>
+          <div id="resumeTips"></div>
+        </div>
+        <div style="background:rgba(26,111,240,0.05);border:1px solid rgba(26,111,240,0.12);border-radius:18px;padding:24px;box-shadow:var(--shadow);">
+          <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:16px;color:var(--text);">✅ Resume Checklist</div>
+          <div id="clList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPANIES -->
+    <div class="section" id="sec-companies">
+      <div class="sh">🏢 Top Recruiting Companies</div>
+      <div class="ss">Placement patterns, packages, and what to prepare</div>
+      <div class="g3" id="companyGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<div class="chat-fab" onclick="toggleChat()">🤖<div class="cdot"></div></div>
+<div class="chat-win" id="chatWin">
+  <div class="ch-head">
+    <span style="font-size:20px;">🤖</span>
+    <div><div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--text);">PlaceBot</div><div class="ch-status">● Online</div></div>
+    <span class="ch-close" onclick="toggleChat()">✕</span>
+  </div>
+  <div class="ch-msgs" id="chMsgs"><div class="ch-m bot">Hey! I'm PlaceBot 👋 Ask me about DSA, mock interviews, ATS checker, job roles, or companies!</div></div>
+  <div class="ch-row">
+    <input class="ch-input" id="chInput" placeholder="Ask PlaceBot..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="ch-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+// ── ANIMATED BACKGROUND ──
+(function(){
+  const canvas=document.getElementById('bg-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,blobs=[],particles=[];
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  // Create floating blobs
+  const blobColors=['rgba(26,111,240,','rgba(14,165,233,','rgba(16,185,129,','rgba(139,92,246,'];
+  for(let i=0;i<6;i++){
+    blobs.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,
+      r:80+Math.random()*120,
+      color:blobColors[i%4],
+      opacity:0.04+Math.random()*0.06
+    });
+  }
+  // Particles
+  for(let i=0;i<40;i++){
+    particles.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,
+      r:Math.random()*2+0.5,
+      color:blobColors[Math.floor(Math.random()*4)]
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Draw blobs
+    blobs.forEach(b=>{
+      b.x+=b.vx;b.y+=b.vy;
+      if(b.x<-b.r)b.x=W+b.r;if(b.x>W+b.r)b.x=-b.r;
+      if(b.y<-b.r)b.y=H+b.r;if(b.y>H+b.r)b.y=-b.r;
+      const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+      g.addColorStop(0,b.color+b.opacity+')');
+      g.addColorStop(1,b.color+'0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
+    });
+    // Draw particles
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+'0.5)';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── DATA ──
+const DSA_PROBLEMS=[
+  {id:1,name:"Two Sum",topic:"Arrays",diff:"easy",url:"https://leetcode.com/problems/two-sum/"},
+  {id:2,name:"Best Time to Buy & Sell Stock",topic:"Arrays",diff:"easy",url:"https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"},
+  {id:3,name:"Contains Duplicate",topic:"Arrays",diff:"easy",url:"https://leetcode.com/problems/contains-duplicate/"},
+  {id:4,name:"Maximum Subarray (Kadane's)",topic:"Arrays",diff:"medium",url:"https://leetcode.com/problems/maximum-subarray/"},
+  {id:5,name:"Product of Array Except Self",topic:"Arrays",diff:"medium",url:"https://leetcode.com/problems/product-of-array-except-self/"},
+  {id:6,name:"3Sum",topic:"Arrays",diff:"medium",url:"https://leetcode.com/problems/3sum/"},
+  {id:7,name:"Merge Intervals",topic:"Arrays",diff:"medium",url:"https://leetcode.com/problems/merge-intervals/"},
+  {id:8,name:"Trapping Rain Water",topic:"Arrays",diff:"hard",url:"https://leetcode.com/problems/trapping-rain-water/"},
+  {id:9,name:"Valid Anagram",topic:"Strings",diff:"easy",url:"https://leetcode.com/problems/valid-anagram/"},
+  {id:10,name:"Valid Palindrome",topic:"Strings",diff:"easy",url:"https://leetcode.com/problems/valid-palindrome/"},
+  {id:11,name:"Longest Substring Without Repeating",topic:"Strings",diff:"medium",url:"https://leetcode.com/problems/longest-substring-without-repeating-characters/"},
+  {id:12,name:"Longest Palindromic Substring",topic:"Strings",diff:"medium",url:"https://leetcode.com/problems/longest-palindromic-substring/"},
+  {id:13,name:"Group Anagrams",topic:"Strings",diff:"medium",url:"https://leetcode.com/problems/group-anagrams/"},
+  {id:14,name:"Minimum Window Substring",topic:"Strings",diff:"hard",url:"https://leetcode.com/problems/minimum-window-substring/"},
+  {id:15,name:"Reverse Linked List",topic:"Linked List",diff:"easy",url:"https://leetcode.com/problems/reverse-linked-list/"},
+  {id:16,name:"Merge Two Sorted Lists",topic:"Linked List",diff:"easy",url:"https://leetcode.com/problems/merge-two-sorted-lists/"},
+  {id:17,name:"Linked List Cycle",topic:"Linked List",diff:"easy",url:"https://leetcode.com/problems/linked-list-cycle/"},
+  {id:18,name:"Remove Nth Node From End",topic:"Linked List",diff:"medium",url:"https://leetcode.com/problems/remove-nth-node-from-end-of-list/"},
+  {id:19,name:"Merge K Sorted Lists",topic:"Linked List",diff:"hard",url:"https://leetcode.com/problems/merge-k-sorted-lists/"},
+  {id:20,name:"Maximum Depth of Binary Tree",topic:"Trees",diff:"easy",url:"https://leetcode.com/problems/maximum-depth-of-binary-tree/"},
+  {id:21,name:"Invert Binary Tree",topic:"Trees",diff:"easy",url:"https://leetcode.com/problems/invert-binary-tree/"},
+  {id:22,name:"Same Tree",topic:"Trees",diff:"easy",url:"https://leetcode.com/problems/same-tree/"},
+  {id:23,name:"Binary Tree Level Order Traversal",topic:"Trees",diff:"medium",url:"https://leetcode.com/problems/binary-tree-level-order-traversal/"},
+  {id:24,name:"Validate Binary Search Tree",topic:"Trees",diff:"medium",url:"https://leetcode.com/problems/validate-binary-search-tree/"},
+  {id:25,name:"Binary Tree Maximum Path Sum",topic:"Trees",diff:"hard",url:"https://leetcode.com/problems/binary-tree-maximum-path-sum/"},
+  {id:26,name:"Number of Islands",topic:"Graphs",diff:"medium",url:"https://leetcode.com/problems/number-of-islands/"},
+  {id:27,name:"Clone Graph",topic:"Graphs",diff:"medium",url:"https://leetcode.com/problems/clone-graph/"},
+  {id:28,name:"Course Schedule",topic:"Graphs",diff:"medium",url:"https://leetcode.com/problems/course-schedule/"},
+  {id:29,name:"Pacific Atlantic Water Flow",topic:"Graphs",diff:"medium",url:"https://leetcode.com/problems/pacific-atlantic-water-flow/"},
+  {id:30,name:"Word Ladder",topic:"Graphs",diff:"hard",url:"https://leetcode.com/problems/word-ladder/"},
+  {id:31,name:"Climbing Stairs",topic:"Dynamic Programming",diff:"easy",url:"https://leetcode.com/problems/climbing-stairs/"},
+  {id:32,name:"House Robber",topic:"Dynamic Programming",diff:"medium",url:"https://leetcode.com/problems/house-robber/"},
+  {id:33,name:"Coin Change",topic:"Dynamic Programming",diff:"medium",url:"https://leetcode.com/problems/coin-change/"},
+  {id:34,name:"Longest Common Subsequence",topic:"Dynamic Programming",diff:"medium",url:"https://leetcode.com/problems/longest-common-subsequence/"},
+  {id:35,name:"0/1 Knapsack Problem",topic:"Dynamic Programming",diff:"medium",url:"https://leetcode.com/problems/partition-equal-subset-sum/"},
+  {id:36,name:"Edit Distance",topic:"Dynamic Programming",diff:"hard",url:"https://leetcode.com/problems/edit-distance/"},
+  {id:37,name:"Binary Search",topic:"Binary Search",diff:"easy",url:"https://leetcode.com/problems/binary-search/"},
+  {id:38,name:"Find Minimum in Rotated Sorted Array",topic:"Binary Search",diff:"medium",url:"https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"},
+  {id:39,name:"Search in Rotated Sorted Array",topic:"Binary Search",diff:"medium",url:"https://leetcode.com/problems/search-in-rotated-sorted-array/"},
+  {id:40,name:"Median of Two Sorted Arrays",topic:"Binary Search",diff:"hard",url:"https://leetcode.com/problems/median-of-two-sorted-arrays/"},
+  {id:41,name:"Valid Parentheses",topic:"Stack & Queue",diff:"easy",url:"https://leetcode.com/problems/valid-parentheses/"},
+  {id:42,name:"Min Stack",topic:"Stack & Queue",diff:"medium",url:"https://leetcode.com/problems/min-stack/"},
+  {id:43,name:"Daily Temperatures",topic:"Stack & Queue",diff:"medium",url:"https://leetcode.com/problems/daily-temperatures/"},
+  {id:44,name:"Largest Rectangle in Histogram",topic:"Stack & Queue",diff:"hard",url:"https://leetcode.com/problems/largest-rectangle-in-histogram/"},
+  {id:45,name:"Subsets",topic:"Recursion",diff:"medium",url:"https://leetcode.com/problems/subsets/"},
+  {id:46,name:"Permutations",topic:"Recursion",diff:"medium",url:"https://leetcode.com/problems/permutations/"},
+  {id:47,name:"N-Queens",topic:"Recursion",diff:"hard",url:"https://leetcode.com/problems/n-queens/"},
+  {id:48,name:"Reverse Integer",topic:"Math",diff:"medium",url:"https://leetcode.com/problems/reverse-integer/"},
+  {id:49,name:"Pow(x,n)",topic:"Math",diff:"medium",url:"https://leetcode.com/problems/powx-n/"},
+  {id:50,name:"Majority Element",topic:"Math",diff:"easy",url:"https://leetcode.com/problems/majority-element/"},
+];
+const DSA_TOTAL=180;
+
+const ROADMAP=[
+  {title:"Week 1–2: Arrays & Strings Basics",sub:"Two sum, sliding window, two pointers, frequency maps",days:"14 days",tasks:"12 problems",pct:100},
+  {title:"Week 3: Linked Lists & Stacks",sub:"Reversal, cycle detection, valid parentheses, monotonic stack",days:"7 days",tasks:"8 problems",pct:80},
+  {title:"Week 4: Trees & Binary Search",sub:"DFS, BFS, level order, binary search variants",days:"7 days",tasks:"10 problems",pct:60},
+  {title:"Month 2 Week 1: Graphs & Heaps",sub:"BFS/DFS on grid, Dijkstra, topological sort",days:"7 days",tasks:"10 problems",pct:30},
+  {title:"Month 2 Week 2: Dynamic Programming",sub:"1D DP, 2D DP, knapsack, LCS, LIS",days:"7 days",tasks:"12 problems",pct:10},
+  {title:"Month 2 Week 3–4: Aptitude Sprint",sub:"Percentages, time & work, speed, puzzles, IndiaBix daily",days:"14 days",tasks:"70+ questions",pct:0},
+  {title:"Month 3 Week 1–2: Mock Interviews",sub:"Practice Pramp, peer mocks, behavioral question banks",days:"14 days",tasks:"20 sessions",pct:0},
+  {title:"Month 3 Week 3: Resume & Apply",sub:"Polish resume, ATS check, apply to 10+ companies",days:"7 days",tasks:"Applications",pct:0},
+  {title:"Month 3 Week 4: Final Prep",sub:"Revise weak areas, read system design basics, stay confident!",days:"7 days",tasks:"Revision",pct:0},
+];
+
+const MOCK_QUESTIONS={
+  hr:[
+    {q:"Tell me about yourself.",tip:"Structure: Education → Projects → Skills → Why this company. Keep under 2 minutes.",fb:"Great opener! Ensure you end with why you're excited about this specific company."},
+    {q:"What are your greatest strengths and weaknesses?",tip:"Strengths: specific + example. Weakness: real one, but show you're working on it.",fb:"Strong self-awareness shown. Always back strengths with concrete examples from your experience."},
+    {q:"Why do you want to join our company?",tip:"Research the company beforehand. Mention their products, culture, or values that align with you.",fb:"Personalization is key here. Generic answers get filtered out — be specific about what excites you."},
+    {q:"Where do you see yourself in 5 years?",tip:"Show ambition aligned with the company. Mention leadership, growth, and contribution.",fb:"Good answer. Interviewers want to see ambition + loyalty. Avoid saying 'I'll start my own company.'"},
+    {q:"Why should we hire you over other candidates?",tip:"3-part answer: Skills + Achievement + Enthusiasm. This is your elevator pitch!",fb:"This is your moment to shine! Be specific — generic answers like 'I'm a hard worker' won't stand out."},
+  ],
+  technical:[
+    {q:"Explain the difference between an array and a linked list.",tip:"Think about: memory layout, access time O(1) vs O(n), insertion/deletion cost.",fb:"Cover both time and space complexity differences. Mention use-cases for each."},
+    {q:"What is recursion? Give an example.",tip:"Explain: function calling itself, base case, recursive case. Example: factorial or fibonacci.",fb:"Always mention the importance of a base case to avoid infinite loops / stack overflow."},
+    {q:"Explain the concept of time and space complexity.",tip:"Big O notation, O(1), O(n), O(log n), O(n²). Give examples for each.",fb:"Strong answer should include examples and mention that we optimize for worst-case usually."},
+    {q:"What are the 4 pillars of OOP?",tip:"Encapsulation, Abstraction, Inheritance, Polymorphism — give a brief example of each.",fb:"Bonus points if you connect each pillar to a real-world analogy or code example."},
+    {q:"How does binary search work? What is its time complexity?",tip:"Sorted array, mid element check, eliminate half. O(log n) time, O(1) space (iterative).",fb:"Make sure to mention it only works on sorted arrays. Mention iterative vs recursive approach."},
+  ],
+  managerial:[
+    {q:"Describe a time when you had to work under pressure and meet a tight deadline.",tip:"Use STAR: specific situation, what was at stake, what YOU did, result achieved.",fb:"Quantify the result if possible. 'Delivered project 2 days early' is stronger than 'delivered on time.'"},
+    {q:"Tell me about a conflict with a teammate and how you resolved it.",tip:"Stay professional. Focus on resolution, not blame. Show empathy and communication skills.",fb:"Avoid making the other person look bad. Show that you sought to understand their perspective first."},
+    {q:"Describe a project you led. What was your approach?",tip:"Explain how you delegated, communicated, handled blockers, and measured success.",fb:"Highlight leadership, communication, and problem-solving — not just the technical work."},
+    {q:"How do you prioritize when you have multiple tasks with the same deadline?",tip:"Talk about frameworks: impact vs effort matrix, communication with manager, splitting tasks.",fb:"Mentioning that you communicate proactively with stakeholders shows maturity."},
+    {q:"What would you do if you disagreed with your manager's decision?",tip:"Show respect + confidence: acknowledge their perspective, share yours with data, then commit.",fb:"The key insight: you can disagree but still commit. This shows professional maturity."},
+  ],
+};
+
+const QUIZ_Q=[
+  {cat:"Percentages",q:"If 20% of a number is 50, what is the number?",opts:["200","250","300","150"],ans:1,expl:"20% × N = 50 → N = 50/0.2 = 250"},
+  {cat:"Time & Work",q:"A can do a job in 10 days, B in 15 days. Together they finish in?",opts:["5 days","6 days","8 days","4 days"],ans:1,expl:"Combined rate = 1/10 + 1/15 = 5/30 = 1/6. Time = 6 days."},
+  {cat:"Speed & Distance",q:"A train travels 180km in 3 hours. What is its speed?",opts:["50 km/h","55 km/h","60 km/h","70 km/h"],ans:2,expl:"Speed = Distance/Time = 180/3 = 60 km/h"},
+  {cat:"Simple Interest",q:"Simple interest on ₹1000 at 5% per year for 3 years?",opts:["₹100","₹150","₹200","₹250"],ans:1,expl:"SI = P×R×T/100 = 1000×5×3/100 = ₹150"},
+  {cat:"Percentages",q:"What is 15% of 240?",opts:["30","36","42","48"],ans:1,expl:"15% × 240 = 0.15 × 240 = 36"},
+  {cat:"Ratio",q:"If a:b = 3:4 and b:c = 2:3, then a:c = ?",opts:["1:2","3:8","2:3","1:4"],ans:0,expl:"a:b:c = 6:8:12 → a:c = 6:12 = 1:2"},
+  {cat:"Discount",q:"A shopkeeper gives 10% then 5% more discount. Net discount?",opts:["14%","14.5%","15%","13.5%"],ans:1,expl:"Net = 100-(100×0.9×0.95) = 100-85.5 = 14.5%"},
+  {cat:"Pipes",q:"Pipe A fills tank in 6 hrs, B in 4 hrs. Together?",opts:["2 hrs","2.4 hrs","3 hrs","1.5 hrs"],ans:1,expl:"Rate = 1/6+1/4 = 5/12. Time = 12/5 = 2.4 hrs"},
+  {cat:"Probability",q:"A bag has 3 red, 4 blue balls. Probability of picking red?",opts:["3/7","4/7","1/2","2/5"],ans:0,expl:"P(red) = 3/(3+4) = 3/7"},
+  {cat:"Profit & Loss",q:"Buy at ₹80, sell at ₹100. Profit percentage?",opts:["20%","25%","15%","30%"],ans:1,expl:"Profit% = (20/80)×100 = 25%"},
+];
+
+const QA_DATA=[
+  {tag:"hr",q:"Tell me about yourself",a:"Start with education → key projects → 2-3 skills → why this role. Practice out loud, under 2 mins. End with genuine enthusiasm for the company."},
+  {tag:"hr",q:"What are your strengths?",a:"Pick 2-3 real ones with specific examples. 'Quick learner' — back it with: 'I learned React in 2 weeks for my final year project.' Avoid generic buzzwords."},
+  {tag:"hr",q:"What is your weakness?",a:"Pick a real weakness but show self-improvement: 'I used to struggle with public speaking so I joined my college debate club.' Never say perfectionism."},
+  {tag:"hr",q:"Why should we hire you?",a:"3-part answer: Relevant skills + a specific achievement + genuine excitement for this company. Quantify wherever possible."},
+  {tag:"hr",q:"Where do you see yourself in 5 years?",a:"Show ambition aligned with company growth. 'Senior developer → tech lead → mentor others.' Never say you want to start your own company in 5 years."},
+  {tag:"tech",q:"What is OOP? Explain 4 pillars.",a:"Encapsulation (data hiding), Abstraction (only expose needed), Inheritance (child extends parent), Polymorphism (same interface, different behavior). Give examples from your project code."},
+  {tag:"tech",q:"Difference between stack and heap memory?",a:"Stack: function calls, local variables, automatic allocation (fast, limited). Heap: dynamic allocation, longer lifetime, manually managed. Stack overflow happens when recursion is too deep."},
+  {tag:"tech",q:"What is a REST API?",a:"Representational State Transfer. Stateless, uses HTTP verbs (GET, POST, PUT, DELETE). Resources identified by URLs. Returns JSON/XML. Connects frontend to backend."},
+  {tag:"tech",q:"Explain time complexity with examples.",a:"O(1): array lookup. O(log n): binary search. O(n): single loop. O(n log n): merge sort. O(n²): nested loops. Always aim to reduce from O(n²) to O(n) using hashmaps."},
+];
+
+const RESUME_TIPS=[
+  {icon:"📏",bg:"rgba(26,111,240,0.1)",t:"Keep it 1 page",d:"Recruiters scan for 6-10 seconds. 1 clean page > 2 cluttered pages. Remove irrelevant info ruthlessly."},
+  {icon:"⚡",bg:"rgba(245,158,11,0.1)",t:"Lead with action verbs",d:"Built, Developed, Optimized, Reduced, Increased. Quantify: 'Reduced API response time by 40%.'"},
+  {icon:"💼",bg:"rgba(139,92,246,0.1)",t:"Projects are your experience",d:"Add 2-3 strong projects with tech stack + what it does + GitHub link + measurable impact."},
+  {icon:"🔧",bg:"rgba(16,185,129,0.1)",t:"ATS-friendly format",d:"No tables, no photos, no fancy graphics. Simple fonts, clear sections. Use our ATS Checker to verify!"},
+  {icon:"🚫",bg:"rgba(239,68,68,0.1)",t:"What to avoid",d:"No generic objective. No photo. No random hobbies. No 'responsible for' — always 'achieved', 'built', 'led'."},
+];
+const CL_ITEMS=["Contact info + professional email","LinkedIn & GitHub links","Education with CGPA/percentage","2-3 project descriptions with tech stack","Skills: languages, frameworks, tools","Internship (if any)","Saved as PDF (not Word)","Filename: FirstName_LastName_Resume.pdf","Proofread × 3","1 page strictly"];
+
+const COMPANIES=[
+  {name:"TCS",sub:"Tata Consultancy Services",rows:[["Package","3.5 – 7 LPA"],["Test","TCS NQT"],["Focus","Aptitude · Verbal · Coding"],["Process","NQT → TR → HR"]]},
+  {name:"Infosys",sub:"Infosys Limited",rows:[["Package","3.6 – 8 LPA"],["Test","InfyTQ"],["Focus","Reasoning · Verbal · Coding"],["Process","Test → Coding → HR"]]},
+  {name:"Wipro",sub:"Wipro Technologies",rows:[["Package","3.5 – 6 LPA"],["Test","NLTH Test"],["Focus","Aptitude · Essay · Coding"],["Process","Online → Essay → Interview"]]},
+  {name:"Accenture",sub:"Accenture Solutions",rows:[["Package","4.5 – 8 LPA"],["Test","Campus Drive"],["Focus","Communication · Coding"],["Process","Aptitude → Coding → HR"]]},
+  {name:"Cognizant",sub:"CTS — GenC Program",rows:[["Package","4 – 7 LPA"],["Test","GenC Test"],["Focus","Aptitude · Coding · Interview"],["Process","Test → TR → MR → HR"]]},
+  {name:"HCL",sub:"HCL Technologies",rows:[["Package","3.5 – 6.5 LPA"],["Test","HCL TechBee"],["Focus","Aptitude · Tech"],["Process","Aptitude → Tech Interview → HR"]]},
+];
+
+const NOTIFS=[
+  {ico:"🔥",text:"Don't break your streak! Mark today as done.",time:"Just now"},
+  {ico:"🗺️",text:"You're making great progress on your roadmap!",time:"1 hr ago"},
+  {ico:"🤖",text:"Try the new ATS Resume Checker feature!",time:"2 hrs ago"},
+];
+
+// ── JOB ROLES DATA ──
+const JOB_ROLES=[
+  {icon:"⚙️",name:"Software Engineer",domain:"Engineering",color:"var(--blue)",salary:"8–30 LPA",skills:["DSA","OOP","System Design","SQL","Git"],desc:"Build scalable software systems at product companies. Most in-demand role for CS graduates.",details:["Start: Master DSA (Striver's sheet)","Learn: One backend framework (Node/Spring/Django)","Practice: LeetCode daily + system design basics","Apply: TCS/Infosys → startups → FAANG","Growth: SE → SDE-II → Senior → Staff → Principal"]},
+  {icon:"🌐",name:"Full Stack Developer",domain:"Engineering",color:"var(--cyan)",salary:"7–25 LPA",skills:["React","Node.js","MongoDB","REST API","CSS"],desc:"Build both frontend and backend of web applications. Huge demand in startups.",details:["Frontend: HTML/CSS → React → Next.js","Backend: Node.js + Express + MongoDB","Projects: Build 3 full-stack apps with auth","Deploy: Vercel, Railway, AWS basics","Portfolio: GitHub + personal site is a must"]},
+  {icon:"📱",name:"Android/iOS Developer",domain:"Mobile",color:"var(--green)",salary:"8–28 LPA",skills:["Kotlin","Swift","Flutter","Firebase","REST API"],desc:"Build mobile apps for Android or iOS. Flutter lets you target both with one codebase.",details:["Choose: Android (Kotlin) or Flutter (cross-platform)","Learn: UI components, navigation, state mgmt","Backend: Firebase or REST APIs","Publish: At least 1 app on Play Store/App Store","Target: Swiggy, CRED, Razorpay, startups"]},
+  {icon:"🧠",name:"Data Scientist",domain:"Data & AI",color:"var(--purple)",salary:"10–40 LPA",skills:["Python","ML","Pandas","SQL","Statistics"],desc:"Extract insights from data, build ML models, drive business decisions with analytics.",details:["Foundation: Python + Pandas + NumPy + Matplotlib","ML: Scikit-learn, XGBoost, Neural Networks","Specialise: NLP or Computer Vision","Kaggle: Complete 3 competitions for portfolio","Target: Analytics firms, Flipkart, Amazon, banks"]},
+  {icon:"🤖",name:"ML/AI Engineer",domain:"Data & AI",color:"var(--pink)",salary:"12–50 LPA",skills:["PyTorch","TensorFlow","Python","MLOps","Cloud"],desc:"Design and deploy machine learning systems at scale. Fastest growing role in tech.",details:["Learn: Deep Learning + Transformers + LLMs","Deploy: MLflow, Docker, Kubernetes","Cloud: AWS SageMaker or GCP Vertex AI","Papers: Read & implement 2-3 research papers","Target: AI startups, Microsoft, Google, Amazon"]},
+  {icon:"☁️",name:"Cloud / DevOps Engineer",domain:"Infrastructure",color:"var(--teal)",salary:"9–35 LPA",skills:["AWS","Docker","Kubernetes","CI/CD","Linux"],desc:"Design cloud infrastructure and automate deployments. Critical for every tech company.",details:["Certify: AWS Cloud Practitioner → Solutions Architect","Tools: Docker + Kubernetes + Terraform","CI/CD: Jenkins, GitHub Actions, ArgoCD","Monitoring: Prometheus, Grafana, ELK stack","Target: TCS, Infosys cloud teams, startups"]},
+  {icon:"🔐",name:"Cybersecurity Analyst",domain:"Security",color:"var(--orange)",salary:"8–32 LPA",skills:["Networking","Linux","Pentesting","OWASP","Python"],desc:"Protect systems and data from cyber threats. Government and finance sector hire heavily.",details:["Foundation: Networking (TCP/IP) + Linux","Certify: CEH, CompTIA Security+, OSCP","Practice: TryHackMe, HackTheBox, CTFs","Specialise: Web security, network security, or forensics","Target: Banks, government, IT security firms"]},
+  {icon:"📊",name:"Business Analyst",domain:"Business",color:"var(--gold)",salary:"6–22 LPA",skills:["Excel","SQL","PowerBI","Stakeholder Mgmt","JIRA"],desc:"Bridge between business and technology teams. Perfect for people with analytical + communication skills.",details:["Tools: Advanced Excel + SQL + Power BI/Tableau","Cert: CBAP, PMI-PBA (optional)","Domain: Finance, Healthcare, Retail — pick one","Skills: Requirements gathering, process modeling","Target: Accenture, Deloitte, TCS iON, banks"]},
+  {icon:"🎨",name:"UI/UX Designer",domain:"Design",color:"var(--pink)",salary:"6–28 LPA",skills:["Figma","User Research","Prototyping","CSS","Design Systems"],desc:"Design intuitive digital experiences. Combine creativity with psychology and user research.",details:["Tools: Figma + Adobe XD + Framer","Process: User research → wireframes → prototypes → testing","Portfolio: 3-4 case studies with before/after","Learn: Interaction design + accessibility standards","Target: Product companies, design agencies, startups"]},
+  {icon:"📡",name:"Network Engineer",domain:"Infrastructure",color:"var(--blue)",salary:"5–18 LPA",skills:["CCNA","TCP/IP","Routing","Firewall","Linux"],desc:"Design and manage computer networks. Telecom and enterprise companies hire in bulk.",details:["Certify: CCNA → CCNP (Cisco)", "Learn: Routing (OSPF, BGP), switching, VPNs","Tools: Wireshark, GNS3 for lab practice","Domain: ISP, telecom, enterprise IT","Target: BSNL, Jio, Airtel, IT infrastructure firms"]},
+  {icon:"🧪",name:"QA / Test Engineer",domain:"Engineering",color:"var(--green)",salary:"5–20 LPA",skills:["Selenium","JIRA","Python","API Testing","Agile"],desc:"Ensure software quality through automated and manual testing. Stable career with growing demand.",details:["Learn: Manual testing → automation with Selenium/Cypress","API Testing: Postman, RestAssured","Performance: JMeter for load testing","Certify: ISTQB Foundation level","Target: All product and service companies"]},
+  {icon:"💹",name:"Fintech Developer",domain:"Finance",color:"var(--teal)",salary:"10–40 LPA",skills:["Java","Spring Boot","PostgreSQL","Kafka","Security"],desc:"Build payment systems, trading platforms, and banking software. High pay, high stakes.",details:["Core: Java/Spring Boot + microservices","Domain: Payment gateways, KYC, trading systems","Security: PCI-DSS compliance, OAuth, JWT","High Frequency Trading: Low latency C++ optional","Target: Razorpay, Zerodha, PayTM, banks' tech teams"]},
+  {icon:"🏥",name:"HealthTech Developer",domain:"Healthcare",color:"var(--red)",salary:"8–30 LPA",skills:["Python","FHIR","HL7","React","AWS"],desc:"Build healthcare software — EHR systems, diagnostics, telemedicine. Growing rapidly post-COVID.",details:["Standards: HL7, FHIR for health data interchange","Compliance: HIPAA (US), DPDPA (India)","AI in health: Medical imaging, diagnostics","Products: EMR, patient portals, appointment systems","Target: Practo, 1mg, Apollo Hospitals, Manipal Digital"]},
+  {icon:"🎮",name:"Game Developer",domain:"Gaming",color:"var(--purple)",salary:"6–25 LPA",skills:["Unity","C#","Unreal Engine","3D Math","Physics"],desc:"Build games for mobile, PC, or console. India's gaming industry is growing at 28% YoY.",details:["Engine: Unity (mobile/indie) or Unreal (AAA)","Language: C# for Unity, C++ for Unreal","3D Math: Vectors, matrices, quaternions","Portfolio: 3+ complete games on itch.io / Play Store","Target: Nazara, MPL, Dream11, international studios"]},
+  {icon:"📦",name:"Product Manager",domain:"Product",color:"var(--orange)",salary:"15–60 LPA",skills:["Product Thinking","SQL","Metrics","Stakeholder Mgmt","Agile"],desc:"Own the vision and roadmap for a product. PMs are the 'CEO of the product'. High impact, high pay.",details:["Foundation: Deep understanding of one domain (fintech/edtech etc)","Skills: User research, A/B testing, metrics (DAU, NPS, retention)","Tools: JIRA, Mixpanel, Amplitude, Figma","Entry: SDE/BA for 2 years → APM programs → PM","Target: Google APM, Amazon PM, Flipkart, Meesho"]},
+];
+
+// ── STATE ──
+function getState(key,def){try{const v=localStorage.getItem('pw_'+key);return v?JSON.parse(v):def;}catch(e){return def;}}
+function setState(key,val){try{localStorage.setItem('pw_'+key,JSON.stringify(val));}catch(e){}}
+let dsaDone=getState('dsaDone',[]);
+let streakData=getState('streak',{days:0,longest:0,total:0,lastDate:'',history:[]});
+let roadmapDone=getState('roadmap',[]);
+let dailyTasks=getState('daily',[false,false,false,false]);
+
+// ── INIT ──
+window.onload=function(){
+  const user=localStorage.getItem('loggedInUser')||'Student';
+  document.getElementById('sidebarName').textContent=user;
+  document.getElementById('avatarInit').textContent=user.charAt(0).toUpperCase();
+  buildDSA();buildStreak();buildRoadmap();
+  startQuiz();buildQA();buildResume();buildCompanies();buildNotifs();buildRoles();
+  updateHomeStats();
+};
+
+function getNav(name){return document.querySelector(`.nav-item[onclick*="'${name}'"]`);}
+
+function showSection(name,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(el&&el.classList)el.classList.add('active');
+  const titles={home:'Dashboard',dsa:"Striver's DSA Sheet",aptitude:'Aptitude Quiz',mock:'Mock Interview',webcam:'Live Webcam Interview',ats:'ATS Resume Checker',roles:'Job Role Explorer',roadmap:'Placement Roadmap',streak:'Daily Streak',interview:'Interview Tips',resume:'Resume Builder',companies:'Top Companies'};
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showToast(msg,ico='✅'){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<span>${ico}</span> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function updateHomeStats(){
+  const dsaPct=Math.round((dsaDone.length/DSA_TOTAL)*100);
+  const rmPct=Math.round((roadmapDone.length/ROADMAP.length)*100);
+  document.getElementById('hsDone').textContent=dsaDone.length;
+  document.getElementById('hsStreak').textContent=streakData.days;
+  document.getElementById('hsRoadmap').textContent=rmPct+'%';
+  document.getElementById('sideStreakNum').textContent=streakData.days;
+  document.getElementById('homeDSA').textContent=dsaPct+'%';
+  document.getElementById('homeDSABar').style.width=dsaPct+'%';
+  document.getElementById('homeRM').textContent=rmPct+'%';
+  document.getElementById('homeRMBar').style.width=rmPct+'%';
+  document.getElementById('homeDSATag').textContent=`${dsaDone.length} / ${DSA_TOTAL} done`;
+  document.getElementById('dsaBadge').textContent=dsaDone.length;
+}
+
+// ── DSA ──
+let dsaFilter='All';
+function buildDSA(){
+  const topics=['All',...new Set(DSA_PROBLEMS.map(p=>p.topic))];
+  document.getElementById('dsaTabs').innerHTML=topics.map(t=>`<div class="dsa-tab${t==='All'?' active':''}" onclick="filterDSA('${t}',this)">${t}</div>`).join('');
+  renderDSATable();updateDSARing();
+}
+function filterDSA(topic,el){
+  dsaFilter=topic;
+  document.querySelectorAll('.dsa-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');renderDSATable();
+}
+function renderDSATable(){
+  const probs=dsaFilter==='All'?DSA_PROBLEMS:DSA_PROBLEMS.filter(p=>p.topic===dsaFilter);
+  document.getElementById('dsaBody').innerHTML=probs.map(p=>`
+    <tr>
+      <td><div class="dsa-check${dsaDone.includes(p.id)?' done':''}" onclick="toggleDSA(${p.id},this)"></div></td>
+      <td style="font-size:13.5px;font-weight:500;${dsaDone.includes(p.id)?'text-decoration:line-through;color:var(--muted2)':''}">${p.name}</td>
+      <td><span class="topic-pill">${p.topic}</span></td>
+      <td><span class="diff-badge diff-${p.diff}">${p.diff}</span></td>
+      <td><a class="prob-link" href="${p.url}" target="_blank">LeetCode ↗</a></td>
+    </tr>`).join('');
+}
+function toggleDSA(id,el){
+  if(dsaDone.includes(id)){dsaDone=dsaDone.filter(x=>x!==id);el.classList.remove('done');}
+  else{dsaDone.push(id);el.classList.add('done');showToast('Problem solved! 💪','⚡');}
+  setState('dsaDone',dsaDone);updateDSARing();updateHomeStats();renderDSATable();
+}
+function updateDSARing(){
+  const done=dsaDone.length;
+  document.getElementById('dsaRingNum').textContent=done;
+  const circ=2*Math.PI*34;
+  document.getElementById('dsaRingPath').style.strokeDashoffset=circ*(1-done/DSA_TOTAL);
+}
+function resetDSA(){
+  if(confirm('Reset all DSA progress? This cannot be undone.')){
+    dsaDone=[];setState('dsaDone',[]);buildDSA();updateHomeStats();showToast('DSA progress reset','🔄');
+  }
+}
+
+// ── STREAK ──
+function buildStreak(){
+  const s=streakData;
+  document.getElementById('streakBig').textContent=s.days;
+  document.getElementById('longestStreak').textContent=s.longest;
+  document.getElementById('totalDays').textContent=s.total;
+  document.getElementById('sideStreakNum').textContent=s.days;
+  document.getElementById('hsStreak').textContent=s.days;
+  const emoji=s.days===0?'😴':s.days<3?'🙂':s.days<7?'😊':s.days<14?'🔥':s.days<30?'🚀':'👑';
+  const status=s.days===0?'Start today!':s.days<3?'Getting started!':s.days<7?'Building momentum!':s.days<14?'On fire!':'Unstoppable!';
+  document.getElementById('streakEmoji').textContent=emoji;
+  document.getElementById('streakStatus').textContent=status;
+  buildCalendar();buildDailyChecklist();
+}
+function buildCalendar(){
+  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  document.getElementById('calLabels').innerHTML=days.map(d=>`<div style="font-size:10px;color:var(--muted2);text-align:center;font-weight:700;">${d}</div>`).join('');
+  const history=streakData.history||[];
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('calGrid').innerHTML=Array.from({length:35},(_,i)=>{
+    const d=new Date(today);d.setDate(today.getDate()-34+i);
+    const ds=d.toISOString().split('T')[0];
+    const isToday=ds===today.toISOString().split('T')[0];
+    const done=history.includes(ds);
+    return `<div class="cal-cell${done?' done':''}${isToday?' today':''}" title="${ds}"></div>`;
+  }).join('');
+}
+function buildDailyChecklist(){
+  const tasks=['Solve 2 DSA problems','Practice 10 aptitude questions','Review 1 interview concept','Update your resume/ATS score'];
+  document.getElementById('dailyChecklist').innerHTML=tasks.map((t,i)=>`
+    <div class="checklist-item" onclick="toggleDailyTask(${i})">
+      <div class="cl-box${dailyTasks[i]?' checked':''}"></div>
+      <div class="cl-text" style="${dailyTasks[i]?'text-decoration:line-through;color:var(--muted2)':''}">${t}</div>
+    </div>`).join('');
+}
+function toggleDailyTask(i){dailyTasks[i]=!dailyTasks[i];setState('daily',dailyTasks);buildDailyChecklist();}
+function markTodayDone(){
+  const today=new Date().toISOString().split('T')[0];
+  if(streakData.lastDate===today){showToast("Already marked today! See you tomorrow 🌟",'🔥');return;}
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const yStr=yesterday.toISOString().split('T')[0];
+  if(streakData.lastDate===yStr)streakData.days++;else streakData.days=1;
+  streakData.longest=Math.max(streakData.longest,streakData.days);
+  streakData.total++;streakData.lastDate=today;
+  if(!streakData.history)streakData.history=[];
+  streakData.history.push(today);
+  setState('streak',streakData);buildStreak();updateHomeStats();
+  showToast(`🔥 ${streakData.days} day streak! Keep it going!`,'🔥');
+  dailyTasks=[false,false,false,false];setState('daily',dailyTasks);buildDailyChecklist();
+}
+
+// ── ROADMAP ──
+function buildRoadmap(){
+  const pct=Math.round((roadmapDone.length/ROADMAP.length)*100);
+  document.getElementById('rmPct').textContent=pct+'%';
+  document.getElementById('roadmapItems').innerHTML=ROADMAP.map((item,i)=>{
+    const isDone=roadmapDone.includes(i);
+    const isCurrent=!isDone&&(i===0||roadmapDone.includes(i-1));
+    const nodeClass=isDone?'done':isCurrent?'current':'locked';
+    return `<div class="rm-item">
+      <div class="rm-node ${nodeClass}" onclick="toggleRoadmap(${i})">${isDone?'✓':i+1}</div>
+      <div class="rm-card ${nodeClass}" onclick="toggleRoadmap(${i})">
+        <div class="rm-title">${item.title}${isDone?'<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);font-weight:700;">Done ✓</span>':isCurrent?'<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(26,111,240,0.1);color:var(--blue);border:1px solid rgba(26,111,240,0.2);font-weight:700;">In Progress</span>':''}</div>
+        <div class="rm-sub">${item.sub}</div>
+        <div class="rm-pbar"><div class="rm-pfill" style="width:${isDone?100:isCurrent?item.pct:0}%"></div></div>
+        <div class="rm-meta"><span class="rm-met">⏱ ${item.days}</span><span class="rm-met">📝 ${item.tasks}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  updateHomeStats();
+}
+function toggleRoadmap(i){
+  if(roadmapDone.includes(i)){roadmapDone=roadmapDone.filter(x=>x!==i);showToast('Milestone unmarked','↩️');}
+  else{roadmapDone.push(i);showToast('Milestone completed! 🎯','🗺️');}
+  setState('roadmap',roadmapDone);buildRoadmap();
+}
+
+// ── MOCK INTERVIEW ──
+let mockMode='',mockQIdx=0,mockTimer=null,mockTimeLeft=120,mockScores=[];
+function startMock(mode){
+  mockMode=mode;mockQIdx=0;mockScores=[];
+  document.getElementById('mockModeGrid').style.display='none';
+  document.getElementById('interviewRoom').style.display='block';
+  document.getElementById('irTitle').textContent={hr:'HR Interview',technical:'Technical Round',managerial:'Managerial Round'}[mode];
+  loadMockQ();
+}
+function loadMockQ(){
+  const qs=MOCK_QUESTIONS[mockMode];const q=qs[mockQIdx];
+  document.getElementById('irQNum').textContent=`QUESTION ${mockQIdx+1} OF ${qs.length}`;
+  document.getElementById('irQCount').textContent=`Q ${mockQIdx+1}/${qs.length}`;
+  document.getElementById('irQText').textContent=q.q;
+  document.getElementById('irTip').textContent=q.tip;
+  document.getElementById('irAnswer').value='';
+  document.getElementById('irFeedback').style.display='none';
+  startMockTimer();
+}
+function startMockTimer(){
+  clearInterval(mockTimer);mockTimeLeft=120;updateTimerDisplay();
+  mockTimer=setInterval(()=>{mockTimeLeft--;updateTimerDisplay();if(mockTimeLeft<=0){clearInterval(mockTimer);submitMockAnswer();}},1000);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(mockTimeLeft/60).toString().padStart(2,'0');
+  const s=(mockTimeLeft%60).toString().padStart(2,'0');
+  const el=document.getElementById('irTimer');
+  el.textContent=`${m}:${s}`;
+  el.style.color=mockTimeLeft<=30?'var(--red)':'var(--blue)';
+}
+function submitMockAnswer(){
+  clearInterval(mockTimer);
+  const ans=document.getElementById('irAnswer').value.trim();
+  const q=MOCK_QUESTIONS[mockMode][mockQIdx];
+  const score=ans.length>50?Math.floor(Math.random()*2)+4:ans.length>20?Math.floor(Math.random()*2)+3:2;
+  mockScores.push(score);
+  document.getElementById('irStars').textContent='⭐'.repeat(score)+'☆'.repeat(5-score);
+  document.getElementById('irFbTitle').textContent=score>=4?'Great Answer! 🎉':score>=3?'Good Answer! 👍':'Needs Improvement 📚';
+  document.getElementById('irFbText').textContent=q.fb+(ans.length<30?' Try to give more detailed answers — aim for at least 3-4 sentences.':'');
+  document.getElementById('irFeedback').style.display='block';
+  document.getElementById('irNextBtn').textContent=mockQIdx+1<MOCK_QUESTIONS[mockMode].length?'Next Question →':'See Results 🎯';
+}
+function nextMockQ(){mockQIdx++;if(mockQIdx<MOCK_QUESTIONS[mockMode].length)loadMockQ();else endMock();}
+function skipMockQ(){document.getElementById('irAnswer').value='(skipped)';submitMockAnswer();}
+function endMock(){
+  clearInterval(mockTimer);
+  const avg=mockScores.length?Math.round(mockScores.reduce((a,b)=>a+b,0)/mockScores.length*20):0;
+  document.getElementById('interviewRoom').style.display='none';
+  document.getElementById('mockModeGrid').style.display='grid';
+  showToast(`Mock done! Score: ${avg}%`,'🎙️');
+}
+
+// ── WEBCAM INTERVIEW ──
+let webcamStream=null,webcamMode='hr',webcamQIdx=0,webcamTimer=null,webcamTimeLeft=180,webcamElapsed=0,elapsedTimer=null;
+let confidenceHistory=[],selectedWebcamCard=null;
+
+function selectWebcamMode(mode,card){
+  webcamMode=mode;
+  document.querySelectorAll('#webcamModeGrid .mock-card').forEach(c=>c.style.borderColor='');
+  card.style.borderColor='rgba(26,111,240,0.5)';
+  card.style.background='rgba(26,111,240,0.08)';
+  selectedWebcamCard=card;
+}
+
+async function startWebcamInterview(){
+  try{
+    webcamStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    document.getElementById('webcamVideo').srcObject=webcamStream;
+    document.getElementById('camStatusBadge').className='cam-status cam-active';
+    document.getElementById('camStatusBadge').textContent='● Camera Active';
+    document.getElementById('stopWebcamBtn').style.display='block';
+    document.getElementById('webcamRoom').style.display='block';
+    document.getElementById('webcamResults').style.display='none';
+    webcamQIdx=0;confidenceHistory=[];
+    loadWebcamQ();
+    startConfidenceSimulation();
+    startWebcamTimer();
+    showToast('Webcam interview started! 📹','🔴');
+  }catch(err){
+    showToast('Camera access denied. Please allow camera permissions.','⚠️');
+  }
+}
+
+function loadWebcamQ(){
+  const qs=MOCK_QUESTIONS[webcamMode];
+  const q=qs[webcamQIdx%qs.length];
+  document.getElementById('webcamTitle').textContent={hr:'HR Live Interview',technical:'Technical Live Interview',managerial:'Managerial Live Interview'}[webcamMode];
+  document.getElementById('webcamQNum').textContent=`QUESTION ${webcamQIdx+1} OF ${qs.length}`;
+  document.getElementById('webcamQCount').textContent=`Q ${webcamQIdx+1}/${qs.length}`;
+  document.getElementById('webcamQText').textContent=q.q;
+  document.getElementById('webcamQTip').textContent='💡 '+q.tip;
+  document.getElementById('eyeContactVal').textContent='Analyzing...';
+  document.getElementById('eyeContactVal').className='wm-val';
+  document.getElementById('postureVal').textContent='Analyzing...';
+  document.getElementById('postureVal').className='wm-val';
+  // After 2s, show simulated analysis
+  setTimeout(()=>{
+    const eyeScores=['Good ✓','Excellent ✓','Needs Work','Good ✓','Fair'];
+    const postureScores=['Upright ✓','Slouching','Good ✓','Excellent ✓','Fair'];
+    const eye=eyeScores[Math.floor(Math.random()*eyeScores.length)];
+    const post=postureScores[Math.floor(Math.random()*postureScores.length)];
+    const eyeEl=document.getElementById('eyeContactVal');
+    const postEl=document.getElementById('postureVal');
+    eyeEl.textContent=eye;
+    eyeEl.className='wm-val '+(eye.includes('✓')?'good':eye.includes('Fair')?'avg':'poor');
+    postEl.textContent=post;
+    postEl.className='wm-val '+(post.includes('✓')?'good':post.includes('Fair')?'avg':'poor');
+  },2000);
+}
+
+let confInterval=null;
+function startConfidenceSimulation(){
+  clearInterval(confInterval);
+  let base=55+Math.random()*25;
+  confInterval=setInterval(()=>{
+    base+=((Math.random()-0.4)*8);
+    base=Math.max(30,Math.min(95,base));
+    confidenceHistory.push(Math.round(base));
+    document.getElementById('confidenceFill').style.width=base+'%';
+    document.getElementById('confidenceVal').textContent=Math.round(base)+'%';
+  },1500);
+}
+
+function startWebcamTimer(){
+  clearInterval(webcamTimer);webcamTimeLeft=180;webcamElapsed=0;
+  updateWebcamTimerDisplay();
+  webcamTimer=setInterval(()=>{
+    webcamTimeLeft--;webcamElapsed++;
+    updateWebcamTimerDisplay();
+    document.getElementById('elapsedVal').textContent=Math.floor(webcamElapsed/60)+':'+String(webcamElapsed%60).padStart(2,'0');
+    if(webcamTimeLeft<=0){nextWebcamQ();}
+  },1000);
+}
+
+function updateWebcamTimerDisplay(){
+  const m=Math.floor(webcamTimeLeft/60).toString().padStart(2,'0');
+  const s=(webcamTimeLeft%60).toString().padStart(2,'0');
+  const el=document.getElementById('webcamTimer');
+  el.textContent=`${m}:${s}`;
+  el.style.color=webcamTimeLeft<=30?'#ef4444':'#0ea5e9';
+}
+
+function nextWebcamQ(){
+  webcamQIdx++;
+  const qs=MOCK_QUESTIONS[webcamMode];
+  if(webcamQIdx<qs.length){
+    webcamTimeLeft=180;loadWebcamQ();showToast(`Question ${webcamQIdx+1} — Go!`,'❓');
+  }else{endWebcamInterview();}
+}
+function skipWebcamQ(){nextWebcamQ();}
+
+function endWebcamInterview(){
+  clearInterval(webcamTimer);clearInterval(confInterval);
+  stopWebcam();
+  const avgConf=confidenceHistory.length?Math.round(confidenceHistory.reduce((a,b)=>a+b,0)/confidenceHistory.length):65;
+  const eyeScore=Math.round(60+Math.random()*30);
+  const postureScore=Math.round(65+Math.random()*25);
+  const overallScore=Math.round((avgConf+eyeScore+postureScore)/3);
+  document.getElementById('webcamRoom').style.display='none';
+  document.getElementById('webcamResults').style.display='block';
+  document.getElementById('webcamResultScore').textContent=overallScore+'%';
+  document.getElementById('webcamResultEmoji').textContent=overallScore>=80?'🏆':overallScore>=60?'🎯':'📚';
+  document.getElementById('wRes1').textContent=avgConf+'%';
+  document.getElementById('wRes2').textContent=eyeScore+'%';
+  document.getElementById('wRes3').textContent=postureScore+'%';
+  document.getElementById('wRes4').textContent=Math.floor(webcamElapsed/60)+'m '+webcamElapsed%60+'s';
+  const feedbacks=[
+    overallScore>=80?'Outstanding performance! Your confidence level is very high. ':'Your confidence score shows room for improvement. Practice power poses before interviews. ',
+    eyeScore>=75?'Excellent eye contact — you look engaged and confident. ':'Try to maintain more direct eye contact with the camera. Place it at eye level for natural gaze. ',
+    postureScore>=75?'Great posture throughout — you look professional and attentive. ':'Work on sitting upright. Slouching signals low confidence. Use a lumbar support or practice against a wall. ',
+    'Overall, practice daily with the webcam mode. Confidence comes with repetition!'
+  ];
+  document.getElementById('webcamFeedbackText').innerHTML=feedbacks.join('<br>');
+  showToast(`Interview complete! Score: ${overallScore}%`,'🎉');
+}
+
+function stopWebcam(){
+  if(webcamStream){webcamStream.getTracks().forEach(t=>t.stop());webcamStream=null;}
+  clearInterval(webcamTimer);clearInterval(confInterval);
+  document.getElementById('camStatusBadge').className='cam-status cam-inactive';
+  document.getElementById('camStatusBadge').textContent='● Camera Off';
+  document.getElementById('stopWebcamBtn').style.display='none';
+}
+
+function resetWebcam(){
+  document.getElementById('webcamResults').style.display='none';
+  document.getElementById('webcamRoom').style.display='none';
+}
+
+// ── ATS CHECKER ──
+function runATSCheck(){
+  const resumeText=document.getElementById('atsResumeText').value.trim();
+  const jobText=document.getElementById('atsJobText').value.trim();
+  if(resumeText.length<100){showToast('Please paste more resume content for accurate analysis','⚠️');return;}
+  
+  // ATS analysis logic
+  const text=resumeText.toLowerCase();
+  const checks={
+    contactInfo:{label:'Contact Information',test:()=>text.includes('@')&&(text.includes('phone')||/\d{10}/.test(text)),tip:'Add email, phone, and LinkedIn URL'},
+    skillsSection:{label:'Skills Section',test:()=>text.includes('skill'),tip:"Add a dedicated 'Skills' section with relevant technologies"},
+    experience:{label:'Experience/Projects',test:()=>text.includes('experience')||text.includes('project')||text.includes('intern'),tip:'Include work experience or detailed project descriptions'},
+    education:{label:'Education Section',test:()=>text.includes('education')||text.includes('b.tech')||text.includes('degree')||text.includes('university'),tip:'Include education with degree, institution, and year'},
+    actionVerbs:{label:'Action Verbs Used',test:()=>['built','developed','designed','implemented','led','created','optimized','managed','deployed','increased','reduced'].some(v=>text.includes(v)),tip:"Start bullet points with action verbs like 'Built', 'Developed', 'Optimized'"},
+    quantified:{label:'Quantified Achievements',test:()=>/\d+%|\d+ users|\d+ ms|\d+x/.test(text)||/reduced|improved|increased/.test(text),tip:'Quantify your impact: "Reduced load time by 40%", "Served 500+ users"'},
+    linkedinGithub:{label:'LinkedIn/GitHub Links',test:()=>text.includes('linkedin')||text.includes('github'),tip:'Add your LinkedIn and GitHub profile URLs'},
+    noPersonalInfo:{label:'No Photo/Personal Info',test:()=>!text.includes('date of birth')&&!text.includes('dob')&&!text.includes('marital'),tip:'Remove date of birth, photo, marital status — ATS systems can reject these'},
+    keywords:{label:'Technical Keywords',test:()=>['python','javascript','java','react','sql','api','git','aws','machine learning','data'].some(k=>text.includes(k)),tip:'Include relevant technical keywords from the job description'},
+    singlePage:{label:'Concise Content',test:()=>resumeText.split('\n').length<80&&resumeText.length<5000,tip:'Keep resume to 1 page (under 5000 characters). Remove filler content.'},
+  };
+  
+  // Job keyword matching
+  let keywordScore=0;
+  if(jobText.length>20){
+    const jobWords=jobText.toLowerCase().split(/\s+/).filter(w=>w.length>4);
+    const matched=jobWords.filter(w=>text.includes(w));
+    keywordScore=Math.round((matched.length/Math.max(jobWords.length,1))*100);
+  }
+  
+  const results=Object.entries(checks).map(([key,c])=>({...c,passed:c.test()}));
+  const passCount=results.filter(r=>r.passed).length;
+  const score=Math.round((passCount/results.length)*85)+(keywordScore>0?Math.min(15,Math.round(keywordScore*0.15)):10);
+  const finalScore=Math.min(score,98);
+  
+  document.getElementById('atsInput').style.display='none';
+  document.getElementById('atsResults').style.display='block';
+  
+  // Animate ring
+  const circ=2*Math.PI*50;
+  const offset=circ*(1-finalScore/100);
+  setTimeout(()=>{
+    document.getElementById('atsRingPath').style.strokeDashoffset=offset;
+    document.getElementById('atsScoreNum').textContent=finalScore+'%';
+    document.getElementById('atsScoreNum').style.color=finalScore>=70?'var(--green)':finalScore>=50?'var(--gold)':'var(--red)';
+    document.getElementById('atsScoreLabel').textContent=finalScore>=80?'Excellent! ATS-Friendly 🎉':finalScore>=65?'Good — Minor fixes needed':finalScore>=50?'Average — Needs improvement':'Poor — Major revision needed';
+  },200);
+  
+  document.getElementById('atsResultItems').innerHTML=results.map(r=>`
+    <div class="ats-result-item">
+      <div class="ats-result-icon" style="background:${r.passed?'rgba(16,185,129,0.1)':'rgba(239,68,68,0.08)'}">
+        ${r.passed?'✅':'❌'}
+      </div>
+      <div class="ats-result-text">${r.label}</div>
+      <div class="ats-result-status ${r.passed?'status-pass':'status-fail'}">${r.passed?'Pass':'Fail'}</div>
+    </div>`).join('');
+  
+  const failed=results.filter(r=>!r.passed);
+  const suggestions=failed.length?failed.map((r,i)=>`<b>${i+1}.</b> ${r.tip}`).join('<br>')+
+    (jobText.length>20?`<br><b>${failed.length+1}.</b> Job match score: ${keywordScore}% — add more keywords from the job description`:''):
+    '🎉 Great job! Your resume looks ATS-friendly. Keep it updated with each application.';
+  document.getElementById('atsSuggestions').innerHTML=suggestions;
+}
+
+function resetATS(){
+  document.getElementById('atsInput').style.display='block';
+  document.getElementById('atsResults').style.display='none';
+  document.getElementById('atsResumeText').value='';
+  document.getElementById('atsJobText').value='';
+}
+
+// ── JOB ROLES ──
+let activeRoleFilter='All';
+function buildRoles(){
+  const domains=['All',...new Set(JOB_ROLES.map(r=>r.domain))];
+  document.getElementById('roleFilterBtns').innerHTML=domains.map(d=>`
+    <button onclick="filterRoles('${d}',this)" style="padding:7px 16px;border-radius:20px;border:1.5px solid ${d===activeRoleFilter?'var(--blue)':'rgba(26,111,240,0.2)'};background:${d===activeRoleFilter?'rgba(26,111,240,0.1)':'rgba(255,255,255,0.7)'};color:${d===activeRoleFilter?'var(--blue)':'var(--muted)'};font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;">${d}</button>`).join('');
+  
+  const filtered=activeRoleFilter==='All'?JOB_ROLES:JOB_ROLES.filter(r=>r.domain===activeRoleFilter);
+  document.getElementById('rolesGrid').innerHTML=filtered.map((r,idx)=>`
+    <div class="role-card" onclick="toggleRoleDetail(${idx})">
+      <div class="role-icon">${r.icon}</div>
+      <div class="role-name">${r.name}</div>
+      <div class="role-domain" style="color:${r.color}">${r.domain}</div>
+      <div class="role-desc">${r.desc}</div>
+      <div class="role-skills">${r.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>
+      <div class="role-salary" style="background:${r.color}18;color:${r.color};border:1px solid ${r.color}30;">💰 ${r.salary}</div>
+      <div class="role-detail" id="roleDetail-${idx}">
+        ${r.details.map(d=>`<div class="role-detail-row">${d}</div>`).join('')}
+        <button style="margin-top:10px;padding:7px 16px;border-radius:9px;border:none;background:${r.color};color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;" onclick="event.stopPropagation();showSection('roadmap',getNav('roadmap'))">View Roadmap →</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterRoles(domain,btn){
+  activeRoleFilter=domain;buildRoles();
+}
+
+function toggleRoleDetail(idx){
+  const el=document.getElementById('roleDetail-'+idx);
+  el.classList.toggle('open');
+}
+
+// ── APTITUDE ──
+let qIdx=0,qScore=0,qWrong=0,qTimes=[],qStart=0;
+function startQuiz(){
+  qIdx=0;qScore=0;qWrong=0;qTimes=[];
+  document.getElementById('resultCard').style.display='none';
+  document.getElementById('qArea').style.display='block';
+  renderQ();
+}
+function renderQ(){
+  if(qIdx>=QUIZ_Q.length){showResult();return;}
+  qStart=Date.now();const q=QUIZ_Q[qIdx];
+  document.getElementById('quizQLabel').textContent=`Q ${qIdx+1} / ${QUIZ_Q.length}`;
+  document.getElementById('qpfill').style.width=((qIdx+1)/QUIZ_Q.length*100)+'%';
+  document.getElementById('qScore').textContent=qScore;
+  document.getElementById('qArea').innerHTML=`
+    <div class="q-cat">${q.cat}</div>
+    <div class="q-txt">${q.q}</div>
+    <div class="q-opts">${q.opts.map((o,i)=>`<button class="q-opt" onclick="ansQ(${i},this)">${o}</button>`).join('')}</div>
+    <div class="q-expl" id="qExpl">💡 ${q.expl}</div>`;
+  buildDots();
+}
+function buildDots(){
+  document.getElementById('qDots').innerHTML=QUIZ_Q.map((_,i)=>`<div class="q-dot${i<qIdx?' done':i===qIdx?' current':''}"></div>`).join('');
+}
+function ansQ(idx,btn){
+  const q=QUIZ_Q[qIdx];const t=Math.round((Date.now()-qStart)/1000);qTimes.push(t);
+  document.querySelectorAll('.q-opt').forEach(b=>b.style.pointerEvents='none');
+  if(idx===q.ans){btn.classList.add('correct');qScore++;showToast('Correct! +1 🎯','✅');}
+  else{btn.classList.add('wrong');document.querySelectorAll('.q-opt')[q.ans].classList.add('correct');qWrong++;showToast('Wrong! 📚','❌');}
+  document.getElementById('qExpl').style.display='block';
+  setTimeout(()=>{qIdx++;renderQ();},1600);
+}
+function showResult(){
+  document.getElementById('qArea').style.display='none';
+  document.getElementById('resultCard').style.display='block';
+  const pct=Math.round(qScore/QUIZ_Q.length*100);
+  const avgT=qTimes.length?Math.round(qTimes.reduce((a,b)=>a+b)/qTimes.length):0;
+  document.getElementById('resultScore').textContent=pct+'%';
+  document.getElementById('resultScore').style.color=pct>=80?'var(--green)':pct>=60?'var(--gold)':'var(--red)';
+  document.getElementById('resultEmoji').textContent=pct>=80?'🏆':pct>=60?'🎯':'📚';
+  document.getElementById('resultLabel').textContent=pct>=80?'Excellent! Placement ready!':pct>=60?'Good work! Keep practicing!':'Keep going! Consistency is key!';
+  document.getElementById('rbCorrect').textContent=qScore;
+  document.getElementById('rbWrong').textContent=qWrong;
+  document.getElementById('rbTime').textContent=avgT+'s';
+}
+
+// ── Q&A ──
+function buildQA(){
+  document.getElementById('qaList').innerHTML=QA_DATA.map(item=>`
+    <div class="qa-card" onclick="this.classList.toggle('open')">
+      <div class="qa-q"><span class="qa-tag ${item.tag}">${item.tag.toUpperCase()}</span>${item.q}<span class="qa-chevron">▼</span></div>
+      <div class="qa-a">${item.a}</div>
+    </div>`).join('');
+}
+
+// ── RESUME ──
+function buildResume(){
+  document.getElementById('resumeTips').innerHTML=RESUME_TIPS.map(t=>`
+    <div class="tip-row">
+      <div class="tip-icon-box" style="background:${t.bg}">${t.icon}</div>
+      <div><div class="tip-t">${t.t}</div><div class="tip-d">${t.d}</div></div>
+    </div>`).join('');
+  document.getElementById('clList').innerHTML=CL_ITEMS.map((item,i)=>`
+    <div class="checklist-item" onclick="toggleCL(${i},this)">
+      <div class="cl-box"></div><div class="cl-text">${item}</div>
+    </div>`).join('');
+}
+function toggleCL(i,el){
+  const box=el.querySelector('.cl-box'),text=el.querySelector('.cl-text');
+  const checked=box.classList.toggle('checked');
+  text.style.textDecoration=checked?'line-through':'';
+  text.style.color=checked?'var(--muted2)':'';
+}
+
+// ── COMPANIES ──
+function buildCompanies(){
+  document.getElementById('companyGrid').innerHTML=COMPANIES.map(c=>`
+    <div class="co-card">
+      <div class="co-name">${c.name}</div><div class="co-sub">${c.sub}</div>
+      <div>${c.rows.map(([k,v])=>`<div class="co-row"><span class="co-k">${k}</span><span class="co-v${k==='Package'?' pkg':''}">${v}</span></div>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ── NOTIFICATIONS ──
+function buildNotifs(){
+  document.getElementById('notifList').innerHTML=NOTIFS.map(n=>`
+    <div class="notif-item">
+      <div class="notif-ico">${n.ico}</div>
+      <div><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div>
+    </div>`).join('');
+  document.getElementById('notifCount').textContent=NOTIFS.length;
+}
+function toggleNotif(){document.getElementById('notifPanel').classList.toggle('open');}
+function clearNotifs(){
+  NOTIFS.length=0;buildNotifs();
+  document.getElementById('notifCount').textContent='0';
+  document.getElementById('notifPanel').classList.remove('open');
+  showToast('Notifications cleared','🔔');
+}
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notifPanel');
+  if(!panel.contains(e.target)&&!e.target.closest('.notif-btn'))panel.classList.remove('open');
+});
+
+// ── CHATBOT ──
+function toggleChat(){document.getElementById('chatWin').classList.toggle('open');}
+function sendChat(){
+  const input=document.getElementById('chInput');
+  const msg=input.value.trim();if(!msg)return;
+  const msgs=document.getElementById('chMsgs');
+  msgs.innerHTML+=`<div class="ch-m user">${msg}</div>`;
+  input.value='';msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const m=msg.toLowerCase();let reply;
+    if(m.includes('hello')||m.includes('hi')||m.includes('hey'))reply="Hey! 👋 Ask me about DSA, webcam interview, ATS checker, job roles, or companies!";
+    else if(m.includes('ats')||m.includes('resume'))reply="Try the ATS Checker! Paste your resume text and get an instant score with suggestions 🤖";
+    else if(m.includes('webcam')||m.includes('camera'))reply="Use the Webcam Interview section for live practice with confidence scoring! 📹";
+    else if(m.includes('job role')||m.includes('career'))reply="Check the Job Role Explorer — 15+ career paths with skills, salary & detailed roadmaps! 💼";
+    else if(m.includes('dsa'))reply="For DSA: Open the DSA Sheet — 50 Striver problems with LeetCode links. Solve 2 daily! 💪";
+    else if(m.includes('streak'))reply="Your streak is your superpower! Go to Daily Streak section and mark today as done! 🔥";
+    else if(m.includes('tcs'))reply="TCS: Focus on TCS NQT pattern — Verbal, Aptitude, Coding. Package: 3.5-7 LPA";
+    else if(m.includes('salary')||m.includes('package'))reply="Check the Companies section for salary packages! Software engineers at top MNCs get 8-30 LPA 💰";
+    else reply="I can help with DSA, webcam interviews, ATS checker, job roles, aptitude, or company info! 🤖";
+    msgs.innerHTML+=`<div class="ch-m bot">${reply}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },500);
+}
+
+// ── SEARCH ──
+function doSearch(v){
+  if(!v)return;const s=v.toLowerCase();
+  if(s.includes('dsa')||s.includes('leetcode'))showSection('dsa',getNav('dsa'));
+  else if(s.includes('ats'))showSection('ats',getNav('ats'));
+  else if(s.includes('webcam')||s.includes('camera'))showSection('webcam',getNav('webcam'));
+  else if(s.includes('role')||s.includes('career'))showSection('roles',getNav('roles'));
+  else if(s.includes('streak'))showSection('streak',getNav('streak'));
+  else if(s.includes('road'))showSection('roadmap',getNav('roadmap'));
+  else if(s.includes('mock'))showSection('mock',getNav('mock'));
+  else if(s.includes('apt')||s.includes('quiz'))showSection('aptitude',getNav('aptitude'));
+  else if(s.includes('res'))showSection('resume',getNav('resume'));
+  else if(s.includes('comp'))showSection('companies',getNav('companies'));
+}
+</script>
+</body>
+</html>
