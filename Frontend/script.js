@@ -22,7 +22,7 @@ async function login() {
             alert("Wrong username or password!");
         }
     } catch (error) {
-        alert("Backend not running! Go to backend folder and run: node server.js");
+        alert("Something went wrong. Please try again.");
     }
 }
 
@@ -50,7 +50,7 @@ async function signup() {
             alert("Signup failed. Username may already exist!");
         }
     } catch (error) {
-        alert("Backend not running! Go to backend folder and run: node server.js");
+        alert("Something went wrong. Please try again.");
     }
 }
 
