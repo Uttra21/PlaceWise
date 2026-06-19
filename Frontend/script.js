@@ -9,7 +9,7 @@ async function login() {
     }
 
     try {
-        let res = await fetch("https://placewise-backend-xgpm.onrender.com/login", {
+        let res = await fetch("https://twoplacewise.onrender.com/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, password: pass })
@@ -37,7 +37,7 @@ async function signup() {
     }
 
     try {
-        let res = await fetch("https://placewise-backend-xgpm.onrender.com/signup", {
+        let res = await fetch("https://twoplacewise.onrender.com/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, password: pass })
@@ -73,7 +73,7 @@ async function sendMessage() {
     document.getElementById("userInput").value = "";
 
     try {
-        let res = await fetch("https://placewise-backend-xgpm.onrender.com/chat", {
+        let res = await fetch("https://twoplacewise.onrender.com/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: input })
