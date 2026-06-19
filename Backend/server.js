@@ -7,7 +7,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: "https://theplacewise.netlify.app",
+  origin: "https://2placewise.netlify.app",
   credentials: true
 }));
 app.use(express.json());
