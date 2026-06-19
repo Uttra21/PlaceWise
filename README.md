@@ -21,7 +21,7 @@ in one responsive web application.
 
 1. Clone the repository
 
-        git clone https://github.com/Ishanijha03/PlaceWise.git
+        git clone https://github.com/Uttra21/PlaceWise.git
 
 2. Install backend dependencies
 
